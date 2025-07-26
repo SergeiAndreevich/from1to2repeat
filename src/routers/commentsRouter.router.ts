@@ -1,7 +1,7 @@
-import Router from 'express';
+import {Router} from 'express';
 
 export const commentsRouter = Router({});
 
 commentsRouter
-    .get('')
-    .post('')
+    .get('/')
+    .post('/')
