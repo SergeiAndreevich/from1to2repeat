@@ -20,3 +20,9 @@ export type TypeBlogViewModel = {
     createdAt: Date,
     isMembership: boolean
 }
+
+export type TypePostToBlogInputModel = {
+    title: string,
+    shortDescription: string,
+    content: string
+}

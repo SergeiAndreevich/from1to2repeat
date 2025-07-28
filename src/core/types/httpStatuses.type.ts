@@ -9,4 +9,5 @@ export enum httpStatus{
     NotFound = 404,
 
     InternalServerError = 500,
+    ExtraError = 600
 }

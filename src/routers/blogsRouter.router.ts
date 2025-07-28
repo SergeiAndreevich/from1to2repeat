@@ -5,11 +5,23 @@ import {queryPaginationValidation} from "../core/validation/queryValidation.vali
 import {checkValidationErrors} from "../core/errors/validationErrorResult.handler";
 import {getAllBlogsHandler} from "../Entity/Blogs/handlers/getAllBlogs.handler";
 import {basicGuard} from "../core/auth/basicGuard.middleware";
+import {blogInputValidation} from "../core/validation/blogInputValidation.validation";
+import {blogIdValidation} from "../core/validation/blogIdValidation.validation";
+import {PostToBlogInputValidation} from "../core/validation/postToBlogInputValidation.validation";
+import {getBlogByIdHandler} from "../Entity/Blogs/handlers/getBlogById.handler";
+import {createPostForSpecificBlogHandler} from "../Entity/Blogs/handlers/createPostForSpecificBlog.handler";
+import {createBlogHandler} from "../Entity/Blogs/handlers/createBlog.handler";
+import {updateBlogHandler} from "../Entity/Blogs/handlers/updateBlog.handler";
+import {removeBlogHandler} from "../Entity/Blogs/handlers/removeBlog.handler";
+import {getPostsForSpecificBlogHandler} from "../Entity/Blogs/handlers/getPostsForSpecificBlog.handler";
 
 export const blogsRouter = Router({});
 
 blogsRouter
     .get('/', queryPaginationValidation(BlogsSortFields), checkValidationErrors, getAllBlogsHandler)
+    .get('/:id', idValidation, checkValidationErrors,getBlogByIdHandler)
+    .get('/:blogId/posts', blogIdValidation, checkValidationErrors, getPostsForSpecificBlogHandler)
+    .post('/:blogId/posts', basicGuard, blogIdValidation, PostToBlogInputValidation, checkValidationErrors, createPostForSpecificBlogHandler)
     .post('/', basicGuard, blogInputValidation, checkValidationErrors, createBlogHandler)
-    .put('/:id', idValidation)
-    .delete('/:id', idValidation)
+    .put('/:id', basicGuard, idValidation, blogInputValidation, checkValidationErrors, updateBlogHandler)
+    .delete('/:id', basicGuard, idValidation, checkValidationErrors, removeBlogHandler)

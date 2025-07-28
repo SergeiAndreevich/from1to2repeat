@@ -1,29 +1,61 @@
 import {IResult, ResultStatuses} from "../types/ResultObject.type";
-import {usersCollection} from "../db/mongoDB.db";
+import {blogsCollection, commentsCollection, postsCollection, usersCollection} from "../db/mongoDB.db";
 import {TypeUser} from "../../Entity/Users/User.types";
 import {ObjectId} from "mongodb";
+import {TypePost} from "../../Entity/Posts/Post.types";
+import {TypeBlog, TypeBlogInputModel} from "../../Entity/Blogs/Blog.types";
 
 export const repository = {
-    async findUserByLoginOrFail(userLogin:string):Promise<IResult<string | null>>{
+    async findUserByLoginOrFail(userLogin: string): Promise<IResult<string | null>> {
         const user = await usersCollection.findOne({login: userLogin});
-        if(user === null){
+        if (user === null) {
             return {data: null, status: ResultStatuses.notFound}
         }
         return {data: user._id.toString(), status: ResultStatuses.success}
     },
-    async findUserByEmailOrFail(userEmail:string):Promise<IResult<string | null>>{
-        const user = await  usersCollection.findOne({email: userEmail});
-        if(user === null){
+    async findUserByEmailOrFail(userEmail: string): Promise<IResult<string | null>> {
+        const user = await usersCollection.findOne({email: userEmail});
+        if (user === null) {
             return {data: null, status: ResultStatuses.notFound}
         }
         return {data: user._id.toString(), status: ResultStatuses.success}
     },
-    async createUser(newUser:TypeUser){
+    async createUser(newUser: TypeUser) {
         const createdUser = await usersCollection.insertOne(newUser);
         return createdUser.insertedId.toString()
     },
-    async removeUser(userId: string){
+    async removeUser(userId: string) {
         await usersCollection.deleteOne({_id: new ObjectId(userId)})
+        return
+    },
+    async removeAllData() {
+        await usersCollection.deleteMany({});
+        await postsCollection.deleteMany({});
+        await blogsCollection.deleteMany({});
+        await commentsCollection.deleteMany({});
+        return
+    },
+    async createPost(newPost: TypePost) {
+        const createdPost = await postsCollection.insertOne(newPost);
+        return createdPost.insertedId.toString()
+    },
+    async createBlog(blog: TypeBlog) {
+        const newBlog = await blogsCollection.insertOne(blog);
+        return newBlog.insertedId.toString()
+    },
+    async updateBlog(id: string, newBlog: TypeBlogInputModel): Promise<void> {
+        await blogsCollection.updateOne({_id: new ObjectId(id)},
+            {
+                $set: {
+                    name: newBlog.name,
+                    description: newBlog.description,
+                    websiteUrl: newBlog.websiteUrl
+                }
+            });
+        return
+    },
+    async removeBlog(id: string): Promise<void> {
+        await blogsCollection.deleteOne({_id: new ObjectId(id)});
         return
     }
 }

@@ -1,5 +1,5 @@
 import {IPAginationAndSorting} from "../pagination/pagination-and-sorting.types";
-import {blogsCollection, usersCollection} from "../db/mongoDB.db";
+import {blogsCollection, postsCollection, usersCollection} from "../db/mongoDB.db";
 import {ObjectId, WithId} from "mongodb";
 import {TypeUser, TypeUserViewModel} from "../../Entity/Users/User.types";
 import {mapUserToView} from "../mappers/mapUserToView.mapper";
@@ -10,6 +10,7 @@ import {mapBlogToView} from "../mappers/mapBlogToView.mapper";
 import {bcryptHelper} from "../helpers/bcrypt.helper";
 import {TypeMeViewModel} from "../auth/auth.types";
 import {mapMeToView} from "../mappers/mapMeToView.mapper";
+import {mapPostToView} from "../mappers/mapPostToView.mapper";
 
 //не забудь потом вернуться к пагинации и поправить типы. Как в валидации, так и в приходящей dto
 
@@ -38,6 +39,20 @@ export const queryRepo = {
             return null
         }
         return mapMeToView(user)
+    },
+    async findBlogByIdOrFail(blogId:string):Promise<TypeBlogViewModel | null> {
+        const blog = await blogsCollection.findOne({_id: new ObjectId(blogId)});
+        if(!blog){
+            return null
+        }
+        return mapBlogToView(blog);
+    },
+    async findPostByIdOrFail(postId: string){
+      const post = await  postsCollection.findOne({_id: new ObjectId(postId)});
+      if(!post){
+          return null
+      }
+      return mapPostToView(post)
     },
     async findAllUsersByFilter(dto:IPAginationAndSorting<any>):Promise<TypePaginatorObject<TypeUserViewModel[]>>{
         const {
