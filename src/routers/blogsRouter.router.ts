@@ -1,6 +1,10 @@
 import {Router} from 'express';
 import {idValidation} from "../core/validation/paramsIdValidation.validation";
-import {BlogsSortFields, paginationAndSortingDefault} from "../core/pagination/pagination-and-sorting.types";
+import {
+    BlogsSortFields,
+    paginationAndSortingDefault,
+    PostsSortFields
+} from "../core/pagination/pagination-and-sorting.types";
 import {queryPaginationValidation} from "../core/validation/queryValidation.validation";
 import {checkValidationErrors} from "../core/errors/validationErrorResult.handler";
 import {getAllBlogsHandler} from "../Entity/Blogs/handlers/getAllBlogs.handler";
@@ -17,10 +21,12 @@ import {getPostsForSpecificBlogHandler} from "../Entity/Blogs/handlers/getPostsF
 
 export const blogsRouter = Router({});
 
+//доработай эндпоинты, где есть query
+
 blogsRouter
     .get('/', queryPaginationValidation(BlogsSortFields), checkValidationErrors, getAllBlogsHandler)
     .get('/:id', idValidation, checkValidationErrors,getBlogByIdHandler)
-    .get('/:blogId/posts', blogIdValidation, checkValidationErrors, getPostsForSpecificBlogHandler)
+    .get('/:blogId/posts', blogIdValidation, queryPaginationValidation(BlogsSortFields), checkValidationErrors, getPostsForSpecificBlogHandler)
     .post('/:blogId/posts', basicGuard, blogIdValidation, PostToBlogInputValidation, checkValidationErrors, createPostForSpecificBlogHandler)
     .post('/', basicGuard, blogInputValidation, checkValidationErrors, createBlogHandler)
     .put('/:id', basicGuard, idValidation, blogInputValidation, checkValidationErrors, updateBlogHandler)

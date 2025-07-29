@@ -12,7 +12,7 @@ export const blogIdValidation = param('blogId')
     .custom(async (value) => {
         // value - это значение blogId, которое нужно проверить
         await queryRepo.findBlogByIdOrFail(value);
-        return
+        return value
     })
     .withMessage('Blog with this id does not exist')
 

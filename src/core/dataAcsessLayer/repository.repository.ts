@@ -2,8 +2,9 @@ import {IResult, ResultStatuses} from "../types/ResultObject.type";
 import {blogsCollection, commentsCollection, postsCollection, usersCollection} from "../db/mongoDB.db";
 import {TypeUser} from "../../Entity/Users/User.types";
 import {ObjectId} from "mongodb";
-import {TypePost} from "../../Entity/Posts/Post.types";
+import {TypePost, TypePostInputModel} from "../../Entity/Posts/Post.types";
 import {TypeBlog, TypeBlogInputModel} from "../../Entity/Blogs/Blog.types";
+import {TypeCommentInputModel} from "../../Entity/Comments/Comment.types";
 
 export const repository = {
     async findUserByLoginOrFail(userLogin: string): Promise<IResult<string | null>> {
@@ -56,6 +57,31 @@ export const repository = {
     },
     async removeBlog(id: string): Promise<void> {
         await blogsCollection.deleteOne({_id: new ObjectId(id)});
+        return
+    },
+    async updatePost(id: string, newPost: TypePostInputModel): Promise<void> {
+        await postsCollection.updateOne({_id: new ObjectId(id)},
+            {
+                $set: {
+                    title: newPost.title,
+                    shortDescription: newPost.shortDescription,
+                    content: newPost.content,
+                    blogId: newPost.blogId
+                }
+            });
+        return
+    },
+    async removePost(id: string): Promise<void> {
+        await postsCollection.deleteOne({_id: new ObjectId(id)});
+        return
+    },
+    async updateComment(id: string,dto: TypeCommentInputModel): Promise<void> {
+        await commentsCollection.updateOne({_id: new ObjectId(id)},
+            {
+                $set: {
+                    content: dto.content
+                }
+            });
         return
     }
 }
