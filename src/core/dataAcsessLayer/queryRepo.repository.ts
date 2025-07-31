@@ -13,6 +13,7 @@ import {mapMeToView} from "../mappers/mapMeToView.mapper";
 import {mapPostToView} from "../mappers/mapPostToView.mapper";
 import {TypeCommentViewModel} from "../../Entity/Comments/Comment.types";
 import {mapCommentToView} from "../mappers/mapCommentToView.mapper";
+import {TypePost, TypePostViewModel} from "../../Entity/Posts/Post.types";
 
 //не забудь потом вернуться к пагинации и поправить типы. Как в валидации, так и в приходящей dto
 
@@ -63,7 +64,7 @@ export const queryRepo = {
         }
         return mapCommentToView(comment)
     },
-    async findAllUsersByFilter(dto:IPAginationAndSorting<any>):Promise<TypePaginatorObject<TypeUserViewModel[]>>{
+    async findAllUsersByFilter(dto:IPAginationAndSorting<string>):Promise<TypePaginatorObject<TypeUserViewModel[]>>{
         const {
             pageNumber,
             pageSize,
@@ -72,7 +73,7 @@ export const queryRepo = {
             searchLoginTerm,
             searchEmailTerm
         } = dto;
-        const skip = (pageNumber - 1) * pageSize;
+        const skip = (+pageNumber - 1) * +pageSize;
         const filter: any = {};
 
         if (searchLoginTerm) {
@@ -90,15 +91,15 @@ export const queryRepo = {
             .toArray();
         const totalCount = await usersCollection.countDocuments(filter);
         const usersToView = {
-            pagesCount: Math.ceil(totalCount / pageSize),
-            page: pageNumber,
-            pageSize: pageSize,
+            pagesCount: Math.ceil(+totalCount / +pageSize),
+            page: +pageNumber,
+            pageSize: +pageSize,
             totalCount: totalCount,
             items: items.map((item: WithId<TypeUser>) => mapUserToView(item))
         }
         return usersToView
     },
-    async findAllBlogsByFilter(dto:IPAginationAndSorting<any>):Promise<TypePaginatorObject<TypeBlogViewModel[]>>{
+    async findAllBlogsByFilter(dto:IPAginationAndSorting<string>):Promise<TypePaginatorObject<TypeBlogViewModel[]>>{
         const {
             pageNumber,
             pageSize,
@@ -106,28 +107,99 @@ export const queryRepo = {
             sortDirection,
             searchNameTerm
         } = dto;
-        const skip = (pageNumber-1)*pageSize;
-        const filter:any ={};
-        if (searchNameTerm) {
+        const skip = (+pageNumber-1)*(+pageSize);
+        const filter:any = {}
+        if(searchNameTerm) {
             filter.name = { $regex: searchNameTerm, $options: 'i' };
         }
         const items = await blogsCollection
             .find(filter)
             .sort({ [sortBy]: sortDirection })
             .skip(skip)
-            .limit(pageSize)
+            .limit(+pageSize)
             .toArray();
         const totalCount = await blogsCollection.countDocuments(filter);
         const blogsToView:TypePaginatorObject<TypeBlogViewModel[]> = {
-            pagesCount: Math.ceil(totalCount/pageSize),
-            page: pageNumber,
-            pageSize: pageSize,
+            pagesCount: Math.ceil(+totalCount/+pageSize),
+            page: +pageNumber,
+            pageSize: +pageSize,
             totalCount: totalCount,
             items: items.map((item:WithId<TypeBlog>)=> mapBlogToView(item))
         }
-        return{}
+        return blogsToView
     },
-    async findAllPostsForBlog(blogId:string,query:IPAginationAndSorting<any>){
-
+    async findAllPostsForBlog(blogId:string,query:IPAginationAndSorting<string>):Promise<TypePaginatorObject<TypePostViewModel[]>>{
+        const {
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+            searchNameTerm,
+            searchEmailTerm,
+            searchLoginTerm
+        } = query;
+        const skip = (+pageNumber - 1) * +pageSize;
+        const filter: any = {blogId: blogId};
+        if (searchNameTerm) {
+            filter.name = { $regex: searchNameTerm, $options: 'i' };
+        }
+        if(searchLoginTerm){
+            filter.login = {$regex: searchLoginTerm, $options: 'i'}
+        }
+        if(searchEmailTerm) {
+            filter.email = { $regex: searchEmailTerm, $options: 'i' };
+        }
+        const items = await postsCollection
+            .find(filter)
+            .sort({ [sortBy]: sortDirection })
+            .skip(skip)
+            .limit(+pageSize)
+            .toArray();
+        const totalCount = await usersCollection.countDocuments(filter);
+        const postsToView: TypePaginatorObject<TypePostViewModel[]> = {
+            pagesCount: Math.ceil(+totalCount/+pageSize),
+            page: +pageNumber,
+            pageSize: +pageSize,
+            totalCount: totalCount,
+            items: items.map((item:WithId<TypePost>)=> mapPostToView(item))
+        }
+        return postsToView
+    },
+    async findAllPostsByFilter(dto:IPAginationAndSorting<string>):Promise<TypePaginatorObject<TypePostViewModel[]>>{
+        const {
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection,
+            searchNameTerm,
+            searchEmailTerm,
+            searchLoginTerm
+        } = dto;
+        const skip = (+pageNumber - 1) * +pageSize;
+        const filter: any = {};
+        if (searchNameTerm) {
+            filter.name = { $regex: searchNameTerm, $options: 'i' };
+        }
+        if(searchLoginTerm){
+            filter.login = {$regex: searchLoginTerm, $options: 'i'}
+        }
+        if(searchEmailTerm) {
+            filter.email = { $regex: searchEmailTerm, $options: 'i' };
+        }
+        const items = await postsCollection
+            .find(filter)
+            .sort({ [sortBy]: sortDirection })
+            .skip(skip)
+            .limit(+pageSize)
+            .toArray();
+        const totalCount = await usersCollection.countDocuments(filter);
+        const postsToView: TypePaginatorObject<TypePostViewModel[]> = {
+            pagesCount: Math.ceil(+totalCount/+pageSize),
+            page: +pageNumber,
+            pageSize: +pageSize,
+            totalCount: totalCount,
+            items: items.map((item:WithId<TypePost>)=> mapPostToView(item))
+        }
+        return postsToView
     }
 }

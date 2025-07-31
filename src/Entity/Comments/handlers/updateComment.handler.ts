@@ -2,7 +2,7 @@ import {Request, Response} from "express";
 import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../../../core/types/httpStatuses.type";
 import {commentsCollection} from "../../../core/db/mongoDB.db";
-import {commentService} from "./commentService.bll";
+import {commentService} from "../BLL/commentService.bll";
 
 export async function updateCommentHandler(req: Request, res: Response) {
     const commentId = req.params.id;

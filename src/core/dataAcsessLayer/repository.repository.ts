@@ -4,7 +4,7 @@ import {TypeUser} from "../../Entity/Users/User.types";
 import {ObjectId} from "mongodb";
 import {TypePost, TypePostInputModel} from "../../Entity/Posts/Post.types";
 import {TypeBlog, TypeBlogInputModel} from "../../Entity/Blogs/Blog.types";
-import {TypeCommentInputModel} from "../../Entity/Comments/Comment.types";
+import {TypeComment, TypeCommentInputModel} from "../../Entity/Comments/Comment.types";
 
 export const repository = {
     async findUserByLoginOrFail(userLogin: string): Promise<IResult<string | null>> {
@@ -29,6 +29,10 @@ export const repository = {
         await usersCollection.deleteOne({_id: new ObjectId(userId)})
         return
     },
+    async removeComment(commentId: string) {
+        await commentsCollection.deleteOne({_id: new ObjectId(commentId)});
+        return
+    },
     async removeAllData() {
         await usersCollection.deleteMany({});
         await postsCollection.deleteMany({});
@@ -43,6 +47,10 @@ export const repository = {
     async createBlog(blog: TypeBlog) {
         const newBlog = await blogsCollection.insertOne(blog);
         return newBlog.insertedId.toString()
+    },
+    async createComment(postId:string, newComment: TypeComment) {
+        const createdComment = await commentsCollection.insertOne(newComment);
+        return createdComment.insertedId.toString()
     },
     async updateBlog(id: string, newBlog: TypeBlogInputModel): Promise<void> {
         await blogsCollection.updateOne({_id: new ObjectId(id)},

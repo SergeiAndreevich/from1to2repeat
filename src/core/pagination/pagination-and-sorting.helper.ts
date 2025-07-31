@@ -1,10 +1,15 @@
-import {IPAginationAndSorting, paginationAndSortingDefault, SortDirection} from "./pagination-and-sorting.types";
+import {
+    BlogsSortFields, CommentsSortFields,
+    IPAginationAndSorting,
+    paginationAndSortingDefault, PostsSortFields,
+    SortDirection, UsersSortFields
+} from "./pagination-and-sorting.types";
 
 export function setPaginationAndSortingFilter <T = string>(queryDto:Partial<IPAginationAndSorting<T>>): IPAginationAndSorting<T>{
     //обрати внимание, здесь используются унарные плюсы. Нужно ли это?
     const filter = {
-        pageNumber: queryDto.pageNumber ?  +queryDto.pageNumber : paginationAndSortingDefault.pageNumber,
-        pageSize: queryDto.pageSize ?+queryDto.pageSize : paginationAndSortingDefault.pageSize,
+        pageNumber: queryDto.pageNumber ?  queryDto.pageNumber : paginationAndSortingDefault.pageNumber,
+        pageSize: queryDto.pageSize ?queryDto.pageSize : paginationAndSortingDefault.pageSize,
         sortBy: queryDto.sortBy ? queryDto.sortBy as T : paginationAndSortingDefault.sortBy as T,
         sortDirection: queryDto.sortDirection ? queryDto.sortDirection as SortDirection : paginationAndSortingDefault.sortDirection as SortDirection,
         searchNameTerm: queryDto?.searchNameTerm,

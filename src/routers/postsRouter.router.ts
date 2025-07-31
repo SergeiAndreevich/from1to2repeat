@@ -12,14 +12,17 @@ import {postIdValidation} from "../core/validation/postIdValidation.validation";
 import {commentInputValidation} from "../core/validation/commentInputValidation.validation";
 import {queryPaginationValidation} from "../core/validation/queryValidation.validation";
 import {PostsSortFields} from "../core/pagination/pagination-and-sorting.types";
+import {getAllPostsHandler} from "../Entity/Posts/handlers/getAllPosts.handler";
+import {createCommentForPostHandler} from "../Entity/Posts/handlers/createCommentForPost.handler";
+import {findCommentForPostHandler} from "../Entity/Posts/handlers/findCommentForPost.handler";
 
 export const postsRouter = Router({});
 
 postsRouter
-    .get('/', queryPaginationValidation(PostsSortFields))
+    .get('/', queryPaginationValidation(PostsSortFields), checkValidationErrors, getAllPostsHandler)
     .get('/:id', idValidation, checkValidationErrors, getPostByIdHandler)
     .post('/', basicGuard, postInputValidation, checkValidationErrors, createPostHandler)
     .put('/:id', basicGuard, idValidation, postInputValidation, checkValidationErrors, changePostHandler)
     .delete('/:id', basicGuard, idValidation, checkValidationErrors, removePostHandler)
     .post('/:postId/comments', tokenGuard, postIdValidation, commentInputValidation, checkValidationErrors, createCommentForPostHandler)
-    .get('/:postId/comments', postIdValidation, queryPaginationValidation(PostsSortFields), checkValidationErrors,)
+    .get('/:postId/comments', postIdValidation, queryPaginationValidation(PostsSortFields), checkValidationErrors, findCommentForPostHandler)
