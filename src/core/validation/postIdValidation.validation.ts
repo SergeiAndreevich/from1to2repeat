@@ -9,9 +9,9 @@ export const postIdValidation = param('postId')
     .trim()
     .isMongoId()
     .withMessage('PostId must be a MongoId')
-    .custom(async (value)=> {
-        await queryRepo.findPostByIdOrFail(value);
-        return value
-
-    })
-    .withMessage('Post does not exist')
+    // .custom(async (value)=> {
+    //     await queryRepo.findPostByIdOrFail(value);
+    //     return value
+    //
+    // })
+    // .withMessage('Post does not exist')

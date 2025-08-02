@@ -51,21 +51,21 @@ describe('Testing blogs', () => {
         expect(blogResponse.body.name).toBe('Second');
         const blogsList = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
         expect(blogsList.body.items.length).toBeGreaterThanOrEqual(2);
-        await request(app).put(`${PATH.blogs}/${blogsList.body[0].id}`).set('Authorization',createBasic())
+        await request(app).put(`${PATH.blogs}/${blogsList.body.items[0].id}`).set('Authorization',createBasic())
             .send({name:'NewName', description:'New description', websiteUrl:'https://new.com'}).expect(httpStatus.NoContent);
-        await request(app).delete(`${PATH.blogs}/${blogsList.body[1].id}`).set('Authorization',createBasic()).expect(httpStatus.NoContent);
+        await request(app).delete(`${PATH.blogs}/${blogsList.body.items[1].id}`).set('Authorization',createBasic()).expect(httpStatus.NoContent);
     })
     it('get changed blog by id', async ()=>{
         const blogsList = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
-        const blog = await request(app).get(`${PATH.blogs}/${blogsList.body[0].id}`).expect(httpStatus.Ok);
+        const blog = await request(app).get(`${PATH.blogs}/${blogsList.body.items[0].id}`).expect(httpStatus.Ok);
         expect(blog.body.name).toBe('NewName');
     })
     it('all unauthorized codes', async ()=>{
         const blogsList = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
         await request(app).post(PATH.blogs)
             .send(new TestBlog({name: 'Second', description: 'Second', websiteUrl: 'https://example.com'})).expect(httpStatus.Unauthorized);
-        await request(app).put(`${PATH.blogs}/${blogsList.body[0].id}`)
+        await request(app).put(`${PATH.blogs}/${blogsList.body.items[0].id}`)
             .send({name:'NewName', description:'New description', websiteUrl:'https://new.com'}).expect(httpStatus.Unauthorized);
-        await request(app).delete(`${PATH.blogs}/${blogsList.body[0].id}`).expect(httpStatus.Unauthorized);
+        await request(app).delete(`${PATH.blogs}/${blogsList.body.items[0].id}`).expect(httpStatus.Unauthorized);
     })
 })

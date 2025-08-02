@@ -24,7 +24,7 @@ export const blogsService = {
                 description: dto.description,
                 websiteUrl: dto.websiteUrl,
                 createdAt: new Date(),
-                isMembership: true
+                isMembership: false
             }
             const createdBlogId = await repository.createBlog(newBlog);
             return createdBlogId

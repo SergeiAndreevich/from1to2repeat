@@ -9,12 +9,12 @@ export const blogIdValidation = param('blogId')
     .trim()
     .isMongoId()
     .withMessage('It should be mongoId-view')
-    .custom(async (value) => {
-        // value - это значение blogId, которое нужно проверить
-        await queryRepo.findBlogByIdOrFail(value);
-        return value
-    })
-    .withMessage('Blog with this id does not exist')
+    // .custom(async (value) => {
+    //     // value - это значение blogId, которое нужно проверить
+    //     await queryRepo.findBlogByIdOrFail(value);
+    //     return value
+    // })
+    // .withMessage('Blog with this id does not exist')
 
 // express-validator не требует обязательно бросать ошибку (throw). Он смотрит на:
 //

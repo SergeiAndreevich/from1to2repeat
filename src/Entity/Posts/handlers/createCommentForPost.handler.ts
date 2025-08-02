@@ -6,6 +6,11 @@ import {httpStatus} from "../../../core/types/httpStatuses.type";
 
 export async function createCommentForPostHandler(req:Request, res: Response) {
     const postId = req.params.id;
+    const post = await queryRepo.findPostByIdOrFail(postId);
+    if(!post){
+        res.sendStatus(httpStatus.NotFound);
+        return
+    }
     const commentInput = req.body;
     const commentator = await queryRepo.findUserByIdOrFail(req.userId!);
     const userInfo:TypeCommentatorInfo = {

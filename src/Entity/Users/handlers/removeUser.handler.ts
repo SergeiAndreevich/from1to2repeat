@@ -11,5 +11,5 @@ export async function removeUserHandler(req:Request,res:Response) {
         return
     }
     await repository.removeUser(user.data!.id);
-    res.sendStatus(400)
+    res.sendStatus(204)
 }
