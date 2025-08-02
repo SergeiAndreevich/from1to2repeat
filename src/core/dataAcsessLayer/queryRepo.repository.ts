@@ -1,4 +1,4 @@
-import {IPAginationAndSorting} from "../pagination/pagination-and-sorting.types";
+import {IPAginationAndSorting, PostsSortFields} from "../pagination/pagination-and-sorting.types";
 import {blogsCollection, commentsCollection, postsCollection, usersCollection} from "../db/mongoDB.db";
 import {ObjectId, WithId} from "mongodb";
 import {TypeUser, TypeUserViewModel} from "../../Entity/Users/User.types";
@@ -135,25 +135,25 @@ export const queryRepo = {
             sortBy,
             sortDirection
         } = query;
-        const skip = (+pageNumber - 1) * +pageSize;
+        const skip = (pageNumber - 1)*pageSize;
         const filter: any = {blogId: blogId};
         const items = await postsCollection
             .find(filter)
-            .sort({ [sortBy]: sortDirection })
+            .sort({ [sortBy]: sortDirection, _id:sortDirection})
             .skip(skip)
-            .limit(+pageSize)
+            .limit(pageSize)
             .toArray();
-        const totalCount = await usersCollection.countDocuments(filter);
+        const totalCount = await postsCollection.countDocuments(filter);
         const postsToView: TypePaginatorObject<TypePostViewModel[]> = {
-            pagesCount: Math.ceil(+totalCount/+pageSize),
-            page: +pageNumber,
-            pageSize: +pageSize,
+            pagesCount: Math.ceil(totalCount/pageSize),
+            page: pageNumber,
+            pageSize: pageSize,
             totalCount: totalCount,
             items: items.map((item:WithId<TypePost>)=> mapPostToView(item))
         }
         return postsToView
     },
-    async findAllPostsByFilter(dto:IPAginationAndSorting<string>):Promise<TypePaginatorObject<TypePostViewModel[]>>{
+    async findAllPostsByFilter(dto:IPAginationAndSorting<PostsSortFields>):Promise<TypePaginatorObject<TypePostViewModel[]>>{
         const {
             pageNumber,
             pageSize,

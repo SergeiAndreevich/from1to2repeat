@@ -1,13 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommentsSortFields = exports.UsersSortFields = exports.PostsSortFields = exports.BlogsSortFields = exports.paginationAndSortingDefault = void 0;
+exports.CommentsSortFields = exports.UsersSortFields = exports.PostsSortFields = exports.BlogsSortFields = exports.paginationAndSortingDefault = exports.SortDirection = void 0;
 // потом на место дженерика Т будут приходить **SortFields в зависимости от того, какой ednpoint
+var SortDirection;
+(function (SortDirection) {
+    SortDirection["DESC"] = "desc";
+    SortDirection["ASC"] = "asc";
+})(SortDirection || (exports.SortDirection = SortDirection = {}));
 //ДЕФОЛТНЫЕ ЗНАЧЕНИЯ ПАГИНАЦИИ И СОРТИРОВКИ
 exports.paginationAndSortingDefault = {
     pageNumber: 1,
     pageSize: 10,
     sortBy: 'createdAt',
-    sortDirection: "desc" /* SortDirection.DESC */
+    sortDirection: SortDirection.DESC
 };
 var BlogsSortFields;
 (function (BlogsSortFields) {

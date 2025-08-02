@@ -135,19 +135,19 @@ exports.queryRepo = {
     findAllPostsForBlog(blogId, query) {
         return __awaiter(this, void 0, void 0, function* () {
             const { pageNumber, pageSize, sortBy, sortDirection } = query;
-            const skip = (+pageNumber - 1) * +pageSize;
+            const skip = (pageNumber - 1) * pageSize;
             const filter = { blogId: blogId };
             const items = yield mongoDB_db_1.postsCollection
                 .find(filter)
-                .sort({ [sortBy]: sortDirection })
+                .sort({ [sortBy]: sortDirection, _id: sortDirection })
                 .skip(skip)
-                .limit(+pageSize)
+                .limit(pageSize)
                 .toArray();
-            const totalCount = yield mongoDB_db_1.usersCollection.countDocuments(filter);
+            const totalCount = yield mongoDB_db_1.postsCollection.countDocuments(filter);
             const postsToView = {
-                pagesCount: Math.ceil(+totalCount / +pageSize),
-                page: +pageNumber,
-                pageSize: +pageSize,
+                pagesCount: Math.ceil(totalCount / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
                 totalCount: totalCount,
                 items: items.map((item) => (0, mapPostToView_mapper_1.mapPostToView)(item))
             };

@@ -9,17 +9,17 @@ export interface IPAginationAndSorting<T> {
 }
 // потом на место дженерика Т будут приходить **SortFields в зависимости от того, какой ednpoint
 
+
+export enum SortDirection {
+    DESC = 'desc',
+    ASC = 'asc',
+}
 //ДЕФОЛТНЫЕ ЗНАЧЕНИЯ ПАГИНАЦИИ И СОРТИРОВКИ
 export const paginationAndSortingDefault:IPAginationAndSorting<string> = {
     pageNumber: 1,
     pageSize: 10,
     sortBy: 'createdAt',
     sortDirection: SortDirection.DESC
-}
-
-export const enum SortDirection {
-    ASC = 'asc',
-    DESC = 'desc'
 }
 
 export enum BlogsSortFields {

@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.setPaginationAndSortingFilter = setPaginationAndSortingFilter;
 const pagination_and_sorting_types_1 = require("./pagination-and-sorting.types");
 function setPaginationAndSortingFilter(queryDto) {
-    //обрати внимание, здесь используются унарные плюсы. Нужно ли это?
+    //обрати внимание, здесь используются унарные плюсы. Нужно ли это? (Нужно. Ты в дефолт прописал числами, а из квери приходит строка)
     const filter = {
-        pageNumber: queryDto.pageNumber ? queryDto.pageNumber : pagination_and_sorting_types_1.paginationAndSortingDefault.pageNumber,
-        pageSize: queryDto.pageSize ? queryDto.pageSize : pagination_and_sorting_types_1.paginationAndSortingDefault.pageSize,
+        pageNumber: Number(queryDto.pageNumber) || pagination_and_sorting_types_1.paginationAndSortingDefault.pageNumber,
+        pageSize: Number(queryDto.pageSize) || pagination_and_sorting_types_1.paginationAndSortingDefault.pageSize,
         sortBy: queryDto.sortBy ? queryDto.sortBy : pagination_and_sorting_types_1.paginationAndSortingDefault.sortBy,
         sortDirection: queryDto.sortDirection ? queryDto.sortDirection : pagination_and_sorting_types_1.paginationAndSortingDefault.sortDirection,
         searchNameTerm: queryDto === null || queryDto === void 0 ? void 0 : queryDto.searchNameTerm,

@@ -21,6 +21,8 @@ function getPostsForSpecificBlogHandler(req, res) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
         }
+        //вроде нашел место где ошибка была, из-за которой я не сдал дз
+        //проблема в сортировке монго и сортБай и сортДирекшн
         const filter = (0, pagination_and_sorting_helper_1.setPaginationAndSortingFilter)(req.query);
         const posts = yield queryRepo_repository_1.queryRepo.findAllPostsForBlog(blogId, filter);
         res.status(httpStatuses_type_1.httpStatus.Ok).send(posts);

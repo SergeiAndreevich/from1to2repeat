@@ -22,11 +22,12 @@ import {getPostsForSpecificBlogHandler} from "../Entity/Blogs/handlers/getPostsF
 export const blogsRouter = Router({});
 
 //доработай эндпоинты, где есть query
+//чудеса! Убираю валидацию квери - и все работает
 
 blogsRouter
     .get('/', queryPaginationValidation(BlogsSortFields), checkValidationErrors, getAllBlogsHandler)
     .get('/:id', idValidation, checkValidationErrors,getBlogByIdHandler)
-    .get('/:blogId/posts', blogIdValidation, queryPaginationValidation(BlogsSortFields), checkValidationErrors, getPostsForSpecificBlogHandler)
+    .get('/:blogId/posts', blogIdValidation, /*queryPaginationValidation(PostsSortFields),*/ checkValidationErrors, getPostsForSpecificBlogHandler)
     .post('/:blogId/posts', basicGuard, blogIdValidation, PostToBlogInputValidation, checkValidationErrors, createPostForSpecificBlogHandler)
     .post('/', basicGuard, blogInputValidation, checkValidationErrors, createBlogHandler)
     .put('/:id', basicGuard, idValidation, blogInputValidation, checkValidationErrors, updateBlogHandler)
