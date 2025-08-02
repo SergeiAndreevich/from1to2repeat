@@ -48,7 +48,7 @@ export const repository = {
         const newBlog = await blogsCollection.insertOne(blog);
         return newBlog.insertedId.toString()
     },
-    async createComment(postId:string, newComment: TypeComment) {
+    async createComment( newComment: TypeComment) {
         const createdComment = await commentsCollection.insertOne(newComment);
         return createdComment.insertedId.toString()
     },

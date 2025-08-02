@@ -11,7 +11,7 @@ import {bcryptHelper} from "../helpers/bcrypt.helper";
 import {TypeMeViewModel} from "../auth/auth.types";
 import {mapMeToView} from "../mappers/mapMeToView.mapper";
 import {mapPostToView} from "../mappers/mapPostToView.mapper";
-import {TypeCommentViewModel} from "../../Entity/Comments/Comment.types";
+import {TypeComment, TypeCommentViewModel} from "../../Entity/Comments/Comment.types";
 import {mapCommentToView} from "../mappers/mapCommentToView.mapper";
 import {TypePost, TypePostViewModel} from "../../Entity/Posts/Post.types";
 
@@ -133,22 +133,10 @@ export const queryRepo = {
             pageNumber,
             pageSize,
             sortBy,
-            sortDirection,
-            searchNameTerm,
-            searchEmailTerm,
-            searchLoginTerm
+            sortDirection
         } = query;
         const skip = (+pageNumber - 1) * +pageSize;
         const filter: any = {blogId: blogId};
-        if (searchNameTerm) {
-            filter.name = { $regex: searchNameTerm, $options: 'i' };
-        }
-        if(searchLoginTerm){
-            filter.login = {$regex: searchLoginTerm, $options: 'i'}
-        }
-        if(searchEmailTerm) {
-            filter.email = { $regex: searchEmailTerm, $options: 'i' };
-        }
         const items = await postsCollection
             .find(filter)
             .sort({ [sortBy]: sortDirection })
@@ -170,22 +158,10 @@ export const queryRepo = {
             pageNumber,
             pageSize,
             sortBy,
-            sortDirection,
-            searchNameTerm,
-            searchEmailTerm,
-            searchLoginTerm
+            sortDirection
         } = dto;
         const skip = (+pageNumber - 1) * +pageSize;
         const filter: any = {};
-        if (searchNameTerm) {
-            filter.name = { $regex: searchNameTerm, $options: 'i' };
-        }
-        if(searchLoginTerm){
-            filter.login = {$regex: searchLoginTerm, $options: 'i'}
-        }
-        if(searchEmailTerm) {
-            filter.email = { $regex: searchEmailTerm, $options: 'i' };
-        }
         const items = await postsCollection
             .find(filter)
             .sort({ [sortBy]: sortDirection })
@@ -201,5 +177,33 @@ export const queryRepo = {
             items: items.map((item:WithId<TypePost>)=> mapPostToView(item))
         }
         return postsToView
+    },
+    async findCommentsByPostIdOrFail(dto:IPAginationAndSorting<string>, postId:string){
+        const {
+            pageNumber,
+            pageSize,
+            sortBy,
+            sortDirection
+        } = dto;
+        const skip = (+pageNumber - 1) * +pageSize;
+        const filter: any = {postId: postId};
+        const items = await commentsCollection
+            .find(filter)
+            .sort({ [sortBy]: sortDirection })
+            .skip(skip)
+            .limit(+pageSize)
+            .toArray();
+        const totalCount = await commentsCollection.countDocuments(filter);
+        if(totalCount === 0){
+            return null
+        }
+        const commentsToView: TypePaginatorObject<TypeCommentViewModel[]> = {
+            pagesCount: Math.ceil(+totalCount/+pageSize),
+            page: +pageNumber,
+            pageSize: +pageSize,
+            totalCount: totalCount,
+            items: items.map((item:WithId<TypeComment>)=> mapCommentToView(item))
+        }
+        return commentsToView
     }
 }

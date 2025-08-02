@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "tsc -w",
+    "dev": "nodemon --inspect dist/index.js",
+    "jest": "jest -i",
+    "lint": "eslint --fix .",
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",

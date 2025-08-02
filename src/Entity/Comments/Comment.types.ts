@@ -1,7 +1,8 @@
 export type TypeComment = {
     content: string,
     commentatorInfo: TypeCommentatorInfo,
-    createdAt: Date
+    createdAt: Date,
+    postId:string
 }
 
 export type TypeCommentatorInfo = {

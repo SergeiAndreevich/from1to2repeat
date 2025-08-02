@@ -10,9 +10,10 @@ export const commentService = {
         const comment:TypeComment = {
             content: commentContent.content,
             commentatorInfo: userInfo,
-            createdAt: new Date()
+            createdAt: new Date(),
+            postId: postId
         }
-        const createdId = await repository.createComment(postId, comment);
+        const createdId = await repository.createComment(comment);
         return createdId
     },
     async removeComment(commentId:string){

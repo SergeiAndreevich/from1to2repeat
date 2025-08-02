@@ -1,10 +1,16 @@
 import {Request,Response} from "express";
 import {paginationAndSortingDefault} from "../../../core/pagination/pagination-and-sorting.types";
 import {setPaginationAndSortingFilter} from "../../../core/pagination/pagination-and-sorting.helper";
+import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+import {httpStatus} from "../../../core/types/httpStatuses.type";
 
 export async function findCommentForPostHandler(req:Request,res:Response) {
     const filter = setPaginationAndSortingFilter(req.query);
-    const postId = req.query.postId;
-    //не знаю, как найти коммент по постАйДи
-    //даже придумать не могу, где используется постАйДи
+    const postId = req.params.postId;
+    const commentList = await queryRepo.findCommentsByPostIdOrFail(filter, postId);
+    if(!commentList){
+        res.sendStatus(httpStatus.NotFound);
+        return
+    }
+    res.status(httpStatus.Ok).send(commentList)
 }
