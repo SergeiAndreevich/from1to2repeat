@@ -8,6 +8,4 @@ exports.idValidation = (0, express_validator_1.param)('id')
     .isString()
     .withMessage('Id must be string')
     .isMongoId()
-    .withMessage('Id must be MongoId')
-    .isLength({ min: 1 })
-    .withMessage('Id must be greater than 1');
+    .withMessage('Id must be MongoId');

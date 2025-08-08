@@ -17,14 +17,16 @@ exports.ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'qwerty';
 //Дополнительно себе в тетрадь напиши
 function basicGuard(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
-        //получаем заголовок и проверяем, basic или нет
+        //вытаскиваем из хедерс авторизацию
         const auth = req.headers.authorization;
-        if (!auth) {
+        //если там пусто, то выкидываем ошибку авторизации
+        if (auth === undefined || auth === '') {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
+        // тк мы работаем с Base64, то выглядит это как Base login:password, следовательно, сплитим
         const [base, token] = auth.split(' ');
-        //если первое слово не Base, то снова ошибка
+        //есди первое слово не Base, то снова ошибка
         if (base !== 'Basic') {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;

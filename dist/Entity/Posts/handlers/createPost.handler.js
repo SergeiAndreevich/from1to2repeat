@@ -16,11 +16,19 @@ const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
 function createPostHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const createdId = yield postsService_bll_1.postsService.createPost(req.body);
+        //доп проверка
+        if (!createdId) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.ExtraError);
+            return;
+        }
         const createdPost = yield queryRepo_repository_1.queryRepo.findPostByIdOrFail(createdId);
         if (!createdPost) {
             res.sendStatus(httpStatuses_type_1.httpStatus.ExtraError);
             return;
         }
+        //по документации тут должен быть только 201 и ничего другого, но я сделал отсебятины
         res.status(httpStatuses_type_1.httpStatus.Created).send(createdPost);
     });
 }
+//400 в валидации
+//401 в авторизации

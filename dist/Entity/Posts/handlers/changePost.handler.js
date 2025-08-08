@@ -17,6 +17,7 @@ function changePostHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const postId = req.params.id;
         const post = yield queryRepo_repository_1.queryRepo.findPostByIdOrFail(postId);
+        //отработали 404
         if (!post) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
@@ -25,3 +26,6 @@ function changePostHandler(req, res) {
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
     });
 }
+//здесб задействованы 204,400, 401 и 404
+//400 отрабатывает в валидаторе
+//401 в авторизации

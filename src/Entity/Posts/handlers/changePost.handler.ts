@@ -7,6 +7,7 @@ import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 export async function changePostHandler(req:Request,res:Response) {
     const postId = req.params.id;
     const post = await queryRepo.findPostByIdOrFail(postId);
+    //отработали 404
     if(!post){
         res.sendStatus(httpStatus.NotFound);
         return
@@ -14,3 +15,7 @@ export async function changePostHandler(req:Request,res:Response) {
     await postsService.updatePost(postId,req.body);
     res.sendStatus(httpStatus.NoContent)
 }
+
+//здесб задействованы 204,400, 401 и 404
+//400 отрабатывает в валидаторе
+//401 в авторизации

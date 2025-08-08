@@ -24,6 +24,7 @@ exports.authRouter
     //.post('/login',inputAuthValidation, checkValidationErrors, authHandler)
     .post('/login', inputAuthValidation_validation_1.inputAuthValidation, validationErrorResult_handler_1.checkValidationErrors, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield authService_bll_1.authService.checkUserInfo(req.body);
+    console.log(user);
     if (user.status === ResultObject_type_1.ResultStatuses.success) {
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
         return;

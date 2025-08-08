@@ -17,11 +17,15 @@ function removeBlogHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const blogId = req.params.id;
         const blog = yield queryRepo_repository_1.queryRepo.findBlogByIdOrFail(blogId);
+        //тут отработали 404
         if (!blog) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
         }
         yield blogsService_bll_1.blogsService.removeBlog(blogId);
+        //а здесь 204
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
     });
 }
+//401 в авторизации
+//остается 404 и 204

@@ -16,12 +16,14 @@ const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.
 function createPostForSpecificBlogHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const blog = yield queryRepo_repository_1.queryRepo.findBlogByIdOrFail(req.params.blogId);
+        //здесь отрабатывается 404
         if (!blog) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
         }
         const createdPostId = yield blogsService_bll_1.blogsService.createPostForSpecificBlog(req.params.blogId, req.body);
         const post = yield queryRepo_repository_1.queryRepo.findPostByIdOrFail(createdPostId);
+        //доп проверка
         if (!post) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
@@ -29,3 +31,6 @@ function createPostForSpecificBlogHandler(req, res) {
         res.status(httpStatuses_type_1.httpStatus.Created).send(post);
     });
 }
+//400 делается в валидации
+//401 при авторизации
+//остается 404 и 201

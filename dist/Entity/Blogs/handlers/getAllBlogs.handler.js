@@ -16,7 +16,10 @@ const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
 function getAllBlogsHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         //получаем из query входящие параметры пагинации, закидываем их в функцию (что-то пришло, что-то дефолтное)
-        const filter = (0, pagination_and_sorting_helper_1.setPaginationAndSortingFilter)(req.query);
+        //тк нам может ничего не прийти, то разумеет правильнее сделать все поля необязательными, ведь
+        //дефолтные значения мы присваиваем только потом
+        const query = req.query;
+        const filter = (0, pagination_and_sorting_helper_1.setPaginationAndSortingFilter)(query);
         const blogsList = yield queryRepo_repository_1.queryRepo.findAllBlogsByFilter(filter);
         res.status(httpStatuses_type_1.httpStatus.Ok).send(blogsList);
     });

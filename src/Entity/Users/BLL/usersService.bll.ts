@@ -11,8 +11,12 @@ export const usersService = {
         //проверяем, существует ли уже пользователь с такими login/email
         const userByLogin = await repository.findUserByLoginOrFail(userInput.login);
         const userByEmail = await repository.findUserByEmailOrFail(userInput.email);
-        if( userByLogin.status || userByEmail.status === ResultStatuses.success) {
-            return {data: null, status: ResultStatuses.notFound}
+        //если есть такой логин ИЛИ email, то возвращаем null и статус
+        if( userByLogin.status === ResultStatuses.success) {
+            return {data: null, status: ResultStatuses.alreadyExist}
+        }
+        if( userByEmail.status === ResultStatuses.success) {
+            return {data: null, status: ResultStatuses.alreadyExist}
         }
         //нельзя хранить открытые пароли, поэтому хэшируем
         const passwordHash = await bcryptHelper.gerenateHash(userInput.password, SALT_ROUNDS);

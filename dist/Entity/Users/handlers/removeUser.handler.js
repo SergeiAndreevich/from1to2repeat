@@ -11,17 +11,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeUserHandler = removeUserHandler;
 const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.repository");
-const ResultObject_type_1 = require("../../../core/types/ResultObject.type");
 const repository_repository_1 = require("../../../core/dataAcsessLayer/repository.repository");
+const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
 function removeUserHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const userId = req.params.id;
         const user = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(userId);
-        if (user.status === ResultObject_type_1.ResultStatuses.notFound) {
-            res.sendStatus(404);
+        //отработали 404
+        if (!user) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
         }
-        yield repository_repository_1.repository.removeUser(user.data.id);
-        res.sendStatus(204);
+        yield repository_repository_1.repository.removeUser(user.id);
+        res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
     });
 }
+//должны отработать 204, 401 и 404
+//в авторизации отработали 401

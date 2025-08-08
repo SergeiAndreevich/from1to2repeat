@@ -15,6 +15,7 @@ const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
 function getPostByIdHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const post = yield queryRepo_repository_1.queryRepo.findPostByIdOrFail(req.params.id);
+        //отработали 404
         if (!post) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
@@ -22,3 +23,4 @@ function getPostByIdHandler(req, res) {
         res.status(httpStatuses_type_1.httpStatus.Ok).send(post);
     });
 }
+//тут только 404 и 200

@@ -9,14 +9,14 @@ import {TypeComment, TypeCommentInputModel} from "../../Entity/Comments/Comment.
 export const repository = {
     async findUserByLoginOrFail(userLogin: string): Promise<IResult<string | null>> {
         const user = await usersCollection.findOne({login: userLogin});
-        if (user === null) {
+        if (!user) {
             return {data: null, status: ResultStatuses.notFound}
         }
         return {data: user._id.toString(), status: ResultStatuses.success}
     },
     async findUserByEmailOrFail(userEmail: string): Promise<IResult<string | null>> {
         const user = await usersCollection.findOne({email: userEmail});
-        if (user === null) {
+        if (!user) {
             return {data: null, status: ResultStatuses.notFound}
         }
         return {data: user._id.toString(), status: ResultStatuses.success}

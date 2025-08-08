@@ -23,7 +23,9 @@ const emailValidation = body('email')
     .withMessage('Email must be a string')
     .trim()
     .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-    .withMessage('Login must contain only letters, numbers, underscores, and hyphens');
+    .withMessage('Login must contain only letters, numbers, underscores, and hyphens')
+    .isEmail()
+    .withMessage('Email view is required');
 
 const passwordValidation = body('password')
     .exists()

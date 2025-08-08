@@ -15,7 +15,7 @@ const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.
 const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
 function createCommentForPostHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const postId = req.params.id;
+        const postId = req.params.postId;
         const post = yield queryRepo_repository_1.queryRepo.findPostByIdOrFail(postId);
         if (!post) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
@@ -24,8 +24,8 @@ function createCommentForPostHandler(req, res) {
         const commentInput = req.body;
         const commentator = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(req.userId);
         const userInfo = {
-            userId: commentator.data.id,
-            userLogin: commentator.data.login
+            userId: commentator.id,
+            userLogin: commentator.login
         };
         const createdId = yield commentService_bll_1.commentService.createComment(postId, commentInput, userInfo);
         const comment = yield queryRepo_repository_1.queryRepo.findCommentByIdOrFail(createdId);

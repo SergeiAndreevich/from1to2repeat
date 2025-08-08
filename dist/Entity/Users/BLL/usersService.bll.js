@@ -20,8 +20,12 @@ exports.usersService = {
             //проверяем, существует ли уже пользователь с такими login/email
             const userByLogin = yield repository_repository_1.repository.findUserByLoginOrFail(userInput.login);
             const userByEmail = yield repository_repository_1.repository.findUserByEmailOrFail(userInput.email);
-            if (userByLogin.status || userByEmail.status === ResultObject_type_1.ResultStatuses.success) {
-                return { data: null, status: ResultObject_type_1.ResultStatuses.notFound };
+            //если есть такой логин ИЛИ email, то возвращаем null и статус
+            if (userByLogin.status === ResultObject_type_1.ResultStatuses.success) {
+                return { data: null, status: ResultObject_type_1.ResultStatuses.alreadyExist };
+            }
+            if (userByEmail.status === ResultObject_type_1.ResultStatuses.success) {
+                return { data: null, status: ResultObject_type_1.ResultStatuses.alreadyExist };
             }
             //нельзя хранить открытые пароли, поэтому хэшируем
             const passwordHash = yield bcrypt_helper_1.bcryptHelper.gerenateHash(userInput.password, exports.SALT_ROUNDS);

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkValidationErrors = void 0;
 const express_validator_1 = require("express-validator");
+const httpStatuses_type_1 = require("../types/httpStatuses.type");
 //пишем middleware, которая проверяет ошибки валидации, которые насобирались
 const checkValidationErrors = (req, res, next) => {
     //достаем все ошибки с помощью волшебной функции validationResult(req)
@@ -13,7 +14,7 @@ const checkValidationErrors = (req, res, next) => {
     if (errors.length > 0) {
         //В дальнейшем здесь потребуется дистрибьюция в зависимости от ошибок
         //например, некорректный blogID - это одна ошибка, ошибка инпута - другое. и тп
-        res.status(400).send(createErrorMessage(errors));
+        res.status(httpStatuses_type_1.httpStatus.BadRequest).send(createErrorMessage(errors));
         return;
     }
     next();

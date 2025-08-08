@@ -15,7 +15,8 @@ const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.
 const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
 function getAllPostsHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const filter = (0, pagination_and_sorting_helper_1.setPaginationAndSortingFilter)(req.query);
+        const query = req.query;
+        const filter = (0, pagination_and_sorting_helper_1.setPaginationAndSortingFilter)(query);
         const postsList = yield queryRepo_repository_1.queryRepo.findAllPostsByFilter(filter);
         res.status(httpStatuses_type_1.httpStatus.Ok).send(postsList);
     });

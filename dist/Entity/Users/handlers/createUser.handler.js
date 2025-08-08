@@ -13,6 +13,7 @@ exports.createUserHandler = createUserHandler;
 const usersService_bll_1 = require("../BLL/usersService.bll");
 const ResultObject_type_1 = require("../../../core/types/ResultObject.type");
 const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
+const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.repository");
 function createUserHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         //получили данные из req body
@@ -20,10 +21,17 @@ function createUserHandler(req, res) {
         //передаем их в БЛЛ и просим создать юзера, результатом создания является id
         const newUserResult = yield usersService_bll_1.usersService.createUser(userInput);
         //результат работы по созданию юзера
-        if (newUserResult.status !== ResultObject_type_1.ResultStatuses.success) {
+        if (newUserResult.status === ResultObject_type_1.ResultStatuses.alreadyExist) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
-        res.status(httpStatuses_type_1.httpStatus.Created).send(newUserResult.data);
+        const user = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(newUserResult.data);
+        if (!user) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.ExtraError);
+            return;
+        }
+        res.status(httpStatuses_type_1.httpStatus.Created).send(user);
     });
 }
+//201, 400 и 401
+//401 отработала в авторизации, но еще и здесь проверяет на уникальность логин и email

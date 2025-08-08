@@ -17,6 +17,7 @@ function removePostHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const postId = req.params.id;
         const post = yield queryRepo_repository_1.queryRepo.findPostByIdOrFail(postId);
+        //здесь 404
         if (!post) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
@@ -25,3 +26,5 @@ function removePostHandler(req, res) {
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
     });
 }
+//работают 204, 404 и 401 коды
+//401 в авторизации

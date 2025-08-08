@@ -25,10 +25,12 @@ export const blogsRouter = Router({});
 //чудеса! Убираю валидацию квери - и все работает
 
 blogsRouter
-    .get('/', queryPaginationValidation(BlogsSortFields), checkValidationErrors, getAllBlogsHandler)
+    .get('/', /*queryPaginationValidation(BlogsSortFields), checkValidationErrors,*/ getAllBlogsHandler)
     .get('/:id', idValidation, checkValidationErrors,getBlogByIdHandler)
     .get('/:blogId/posts', blogIdValidation, /*queryPaginationValidation(PostsSortFields),*/ checkValidationErrors, getPostsForSpecificBlogHandler)
     .post('/:blogId/posts', basicGuard, blogIdValidation, PostToBlogInputValidation, checkValidationErrors, createPostForSpecificBlogHandler)
     .post('/', basicGuard, blogInputValidation, checkValidationErrors, createBlogHandler)
     .put('/:id', basicGuard, idValidation, blogInputValidation, checkValidationErrors, updateBlogHandler)
     .delete('/:id', basicGuard, idValidation, checkValidationErrors, removeBlogHandler)
+
+//проверил в постмене - все корректно. Единственное - где был косяк - это req.params - имя должно совпадать с тем, что здесь

@@ -16,10 +16,14 @@ function getBlogByIdHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const blogId = req.params.id;
         const blog = yield queryRepo_repository_1.queryRepo.findBlogByIdOrFail(blogId);
-        if (!blog) {
+        //отработали 404
+        if (blog === null) {
+            console.log(blog);
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
         }
         res.status(httpStatuses_type_1.httpStatus.Ok).send(blog);
     });
 }
+//400 если не прошел валидацию
+//остается 404 и 200

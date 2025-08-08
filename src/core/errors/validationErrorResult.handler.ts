@@ -1,5 +1,6 @@
 import {Request, Response,NextFunction} from "express";
 import {FieldValidationError, ValidationError, validationResult} from "express-validator";
+import {httpStatus} from "../types/httpStatuses.type";
 
 //пишем middleware, которая проверяет ошибки валидации, которые насобирались
 export const checkValidationErrors =
@@ -13,7 +14,7 @@ export const checkValidationErrors =
     if(errors.length > 0){
         //В дальнейшем здесь потребуется дистрибьюция в зависимости от ошибок
         //например, некорректный blogID - это одна ошибка, ошибка инпута - другое. и тп
-        res.status(400).send(createErrorMessage(errors))
+        res.status(httpStatus.BadRequest).send(createErrorMessage(errors))
         return
     }
     next()

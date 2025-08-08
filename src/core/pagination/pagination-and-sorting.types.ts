@@ -31,7 +31,8 @@ export enum PostsSortFields {
 }
 
 export enum UsersSortFields {
-    createdAt = 'createdAt'
+    createdAt = 'createdAt',
+    login = 'login'
 }
 
 export enum CommentsSortFields {

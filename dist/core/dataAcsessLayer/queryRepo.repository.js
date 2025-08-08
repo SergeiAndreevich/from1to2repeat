@@ -23,11 +23,11 @@ const mapCommentToView_mapper_1 = require("../mappers/mapCommentToView.mapper");
 exports.queryRepo = {
     findUserByIdOrFail(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield mongoDB_db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(userId) });
-            if (!result) {
-                return { data: null, status: ResultObject_type_1.ResultStatuses.notFound };
+            const user = yield mongoDB_db_1.usersCollection.findOne({ _id: new mongodb_1.ObjectId(userId) });
+            if (!user) {
+                return null;
             }
-            return { data: (0, mapUserToView_mapper_1.mapUserToView)(result), status: ResultObject_type_1.ResultStatuses.success };
+            return (0, mapUserToView_mapper_1.mapUserToView)(user);
         });
     },
     findUserByAuthOrFail(loginOrEmail, password) {
@@ -82,14 +82,22 @@ exports.queryRepo = {
     findAllUsersByFilter(dto) {
         return __awaiter(this, void 0, void 0, function* () {
             const { pageNumber, pageSize, sortBy, sortDirection, searchLoginTerm, searchEmailTerm } = dto;
-            const skip = (+pageNumber - 1) * +pageSize;
-            const filter = {};
+            const skip = (pageNumber - 1) * pageSize;
+            // const filter: any = {};
+            // if (searchLoginTerm) {
+            //     filter.login = { $regex: searchLoginTerm, $options: 'i' };
+            // }
+            // if (searchEmailTerm) {
+            //     filter.email = { $regex: searchEmailTerm, $options: 'i' };
+            // }
+            const andFilters = [];
             if (searchLoginTerm) {
-                filter.login = { $regex: searchLoginTerm, $options: 'i' };
+                andFilters.push({ login: { $regex: searchLoginTerm, $options: 'i' } });
             }
             if (searchEmailTerm) {
-                filter.email = { $regex: searchEmailTerm, $options: 'i' };
+                andFilters.push({ email: { $regex: searchEmailTerm, $options: 'i' } });
             }
+            const filter = andFilters.length > 0 ? { $or: andFilters } : {};
             const items = yield mongoDB_db_1.usersCollection
                 .find(filter)
                 .sort({ [sortBy]: sortDirection })
@@ -98,9 +106,9 @@ exports.queryRepo = {
                 .toArray();
             const totalCount = yield mongoDB_db_1.usersCollection.countDocuments(filter);
             const usersToView = {
-                pagesCount: Math.ceil(+totalCount / +pageSize),
-                page: +pageNumber,
-                pageSize: +pageSize,
+                pagesCount: Math.ceil(totalCount / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
                 totalCount: totalCount,
                 items: items.map((item) => (0, mapUserToView_mapper_1.mapUserToView)(item))
             };
@@ -110,7 +118,7 @@ exports.queryRepo = {
     findAllBlogsByFilter(dto) {
         return __awaiter(this, void 0, void 0, function* () {
             const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } = dto;
-            const skip = (+pageNumber - 1) * (+pageSize);
+            const skip = (pageNumber - 1) * (pageSize);
             const filter = {};
             if (searchNameTerm) {
                 filter.name = { $regex: searchNameTerm, $options: 'i' };
@@ -119,13 +127,13 @@ exports.queryRepo = {
                 .find(filter)
                 .sort({ [sortBy]: sortDirection })
                 .skip(skip)
-                .limit(+pageSize)
+                .limit(pageSize)
                 .toArray();
             const totalCount = yield mongoDB_db_1.blogsCollection.countDocuments(filter);
             const blogsToView = {
-                pagesCount: Math.ceil(+totalCount / +pageSize),
-                page: +pageNumber,
-                pageSize: +pageSize,
+                pagesCount: Math.ceil(totalCount / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
                 totalCount: totalCount,
                 items: items.map((item) => (0, mapBlogToView_mapper_1.mapBlogToView)(item))
             };
@@ -157,19 +165,19 @@ exports.queryRepo = {
     findAllPostsByFilter(dto) {
         return __awaiter(this, void 0, void 0, function* () {
             const { pageNumber, pageSize, sortBy, sortDirection } = dto;
-            const skip = (+pageNumber - 1) * +pageSize;
+            const skip = (pageNumber - 1) * pageSize;
             const filter = {};
             const items = yield mongoDB_db_1.postsCollection
                 .find(filter)
                 .sort({ [sortBy]: sortDirection })
                 .skip(skip)
-                .limit(+pageSize)
+                .limit(pageSize)
                 .toArray();
-            const totalCount = yield mongoDB_db_1.usersCollection.countDocuments(filter);
+            const totalCount = yield mongoDB_db_1.postsCollection.countDocuments(filter);
             const postsToView = {
-                pagesCount: Math.ceil(+totalCount / +pageSize),
-                page: +pageNumber,
-                pageSize: +pageSize,
+                pagesCount: Math.ceil(totalCount / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
                 totalCount: totalCount,
                 items: items.map((item) => (0, mapPostToView_mapper_1.mapPostToView)(item))
             };

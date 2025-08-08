@@ -17,13 +17,16 @@ function getPostsForSpecificBlogHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const blogId = req.params.blogId;
         const blog = yield queryRepo_repository_1.queryRepo.findBlogByIdOrFail(blogId);
+        //если блог не существует, то 404
         if (!blog) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
         }
         //вроде нашел место где ошибка была, из-за которой я не сдал дз
         //проблема в сортировке монго и сортБай и сортДирекшн
-        const filter = (0, pagination_and_sorting_helper_1.setPaginationAndSortingFilter)(req.query);
+        const query = req.query;
+        //может все исправится щас, если я сделаю partial
+        const filter = (0, pagination_and_sorting_helper_1.setPaginationAndSortingFilter)(query);
         const posts = yield queryRepo_repository_1.queryRepo.findAllPostsForBlog(blogId, filter);
         res.status(httpStatuses_type_1.httpStatus.Ok).send(posts);
     });

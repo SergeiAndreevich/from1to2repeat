@@ -17,10 +17,14 @@ function createBlogHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const createdId = yield blogsService_bll_1.blogsService.createBlog(req.body);
         if (!createdId) {
+            //доп проверка
             res.sendStatus(httpStatuses_type_1.httpStatus.ExtraError);
             return;
         }
         const newBlog = yield queryRepo_repository_1.queryRepo.findBlogByIdOrFail(createdId);
+        //если все ок, то 201
         res.status(httpStatuses_type_1.httpStatus.Created).send(newBlog);
     });
 }
+//ошибка валидации 400
+//в guard ошибка 401 неавторизован

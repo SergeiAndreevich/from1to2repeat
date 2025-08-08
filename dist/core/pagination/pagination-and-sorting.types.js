@@ -25,6 +25,7 @@ var PostsSortFields;
 var UsersSortFields;
 (function (UsersSortFields) {
     UsersSortFields["createdAt"] = "createdAt";
+    UsersSortFields["login"] = "login";
 })(UsersSortFields || (exports.UsersSortFields = UsersSortFields = {}));
 var CommentsSortFields;
 (function (CommentsSortFields) {

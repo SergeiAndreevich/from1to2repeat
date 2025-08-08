@@ -9,7 +9,7 @@ import {removeCommentByIdHandler} from "../Entity/Comments/handlers/removeCommen
 
 export const commentsRouter = Router({});
 
-commentsRouter
-    .get('/:id', idValidation, checkValidationErrors, getCommentByIdHandler)
-    .put('/:commentId', tokenGuard, idValidation, commentInputValidation, checkValidationErrors, updateCommentHandler)
-    .delete('/:commentId', tokenGuard, idValidation, checkValidationErrors, removeCommentByIdHandler)
+// commentsRouter
+//     .get('/:id', idValidation, checkValidationErrors, getCommentByIdHandler)
+//     .put('/:commentId', tokenGuard, idValidation, commentInputValidation, checkValidationErrors, updateCommentHandler)
+//     .delete('/:commentId', tokenGuard, idValidation, checkValidationErrors, removeCommentByIdHandler)

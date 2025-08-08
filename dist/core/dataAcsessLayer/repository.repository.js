@@ -17,7 +17,7 @@ exports.repository = {
     findUserByLoginOrFail(userLogin) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield mongoDB_db_1.usersCollection.findOne({ login: userLogin });
-            if (user === null) {
+            if (!user) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.notFound };
             }
             return { data: user._id.toString(), status: ResultObject_type_1.ResultStatuses.success };
@@ -26,7 +26,7 @@ exports.repository = {
     findUserByEmailOrFail(userEmail) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield mongoDB_db_1.usersCollection.findOne({ email: userEmail });
-            if (user === null) {
+            if (!user) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.notFound };
             }
             return { data: user._id.toString(), status: ResultObject_type_1.ResultStatuses.success };

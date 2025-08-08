@@ -5,7 +5,7 @@ import {TypeCommentatorInfo} from "../../Comments/Comment.types";
 import {httpStatus} from "../../../core/types/httpStatuses.type";
 
 export async function createCommentForPostHandler(req:Request, res: Response) {
-    const postId = req.params.id;
+    const postId = req.params.postId;
     const post = await queryRepo.findPostByIdOrFail(postId);
     if(!post){
         res.sendStatus(httpStatus.NotFound);
@@ -14,8 +14,8 @@ export async function createCommentForPostHandler(req:Request, res: Response) {
     const commentInput = req.body;
     const commentator = await queryRepo.findUserByIdOrFail(req.userId!);
     const userInfo:TypeCommentatorInfo = {
-        userId: commentator.data!.id,
-        userLogin: commentator.data!.login
+        userId: commentator.id,
+        userLogin: commentator.login
     }
     const createdId = await commentService.createComment(postId, commentInput, userInfo);
     const comment = await queryRepo.findCommentByIdOrFail(createdId);
