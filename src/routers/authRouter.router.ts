@@ -13,13 +13,13 @@ export const authRouter = Router({});
 
 authRouter
     .get('/me', tokenGuard, whoAmIHandler)
-    //.post('/login',inputAuthValidation, checkValidationErrors, authHandler)
-    .post('/login', inputAuthValidation, checkValidationErrors, async(req:Request,res:Response)=>{
-        const user = await authService.checkUserInfo(req.body);
-        console.log(user);
-        if(user.status ===  ResultStatuses.success){
-            res.sendStatus(httpStatus.NoContent);
-            return
-        }
-        res.sendStatus(httpStatus.Unauthorized)
-    })
+    .post('/login',inputAuthValidation, checkValidationErrors, authHandler)
+    // .post('/login', inputAuthValidation, checkValidationErrors, async(req:Request,res:Response)=>{
+    //     const user = await authService.checkUserInfo(req.body);
+    //     console.log(user);
+    //     if(user.status ===  ResultStatuses.success){
+    //         res.sendStatus(httpStatus.NoContent);
+    //         return
+    //     }
+    //     res.sendStatus(httpStatus.Unauthorized)
+    // })

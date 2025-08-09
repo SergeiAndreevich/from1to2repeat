@@ -4,6 +4,8 @@ const loginOrEmail = body('loginOrEmail')
     .exists().withMessage('loginOrEmail is required')
     .trim()
     .isString().withMessage('loginOrEmail must be string')
+    .isLength({ min: 1 })
+    .withMessage('It must be more than 1 symbol')
 
 const password = body('password')
     .exists().withMessage('password is required')

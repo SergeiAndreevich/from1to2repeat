@@ -194,22 +194,22 @@ export const queryRepo = {
             sortBy,
             sortDirection
         } = dto;
-        const skip = (+pageNumber - 1) * +pageSize;
+        const skip = (pageNumber - 1) * pageSize;
         const filter: any = {postId: postId};
         const items = await commentsCollection
             .find(filter)
             .sort({ [sortBy]: sortDirection })
             .skip(skip)
-            .limit(+pageSize)
+            .limit(pageSize)
             .toArray();
         const totalCount = await commentsCollection.countDocuments(filter);
         if(totalCount === 0){
             return null
         }
         const commentsToView: TypePaginatorObject<TypeCommentViewModel[]> = {
-            pagesCount: Math.ceil(+totalCount/+pageSize),
-            page: +pageNumber,
-            pageSize: +pageSize,
+            pagesCount: Math.ceil(totalCount/pageSize),
+            page: pageNumber,
+            pageSize: pageSize,
             totalCount: totalCount,
             items: items.map((item:WithId<TypeComment>)=> mapCommentToView(item))
         }

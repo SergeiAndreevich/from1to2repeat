@@ -5,7 +5,7 @@ import {commentsCollection} from "../../../core/db/mongoDB.db";
 import {commentService} from "../BLL/commentService.bll";
 
 export async function updateCommentHandler(req: Request, res: Response) {
-    const commentId = req.params.id;
+    const commentId = req.params.commentId;
     const comment = await queryRepo.findCommentByIdOrFail(commentId);
     if(!comment) {
         res.sendStatus(httpStatus.NotFound);

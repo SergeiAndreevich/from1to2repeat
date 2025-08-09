@@ -15,13 +15,14 @@ const validationErrorResult_handler_1 = require("../core/errors/validationErrorR
 const tockenGuard_middleware_1 = require("../core/auth/tockenGuard.middleware");
 const whoAmI_handler_1 = require("../core/auth/handlers/whoAmI.handler");
 const inputAuthValidation_validation_1 = require("../core/validation/inputAuthValidation.validation");
+const auth_handler_1 = require("../core/auth/handlers/auth.handler");
 const authService_bll_1 = require("../core/auth/BLL/authService.bll");
 const ResultObject_type_1 = require("../core/types/ResultObject.type");
 const httpStatuses_type_1 = require("../core/types/httpStatuses.type");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter
     .get('/me', tockenGuard_middleware_1.tokenGuard, whoAmI_handler_1.whoAmIHandler)
-    //.post('/login',inputAuthValidation, checkValidationErrors, authHandler)
+    .post('/login', inputAuthValidation_validation_1.inputAuthValidation, validationErrorResult_handler_1.checkValidationErrors, auth_handler_1.authHandler)
     .post('/login', inputAuthValidation_validation_1.inputAuthValidation, validationErrorResult_handler_1.checkValidationErrors, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield authService_bll_1.authService.checkUserInfo(req.body);
     console.log(user);
