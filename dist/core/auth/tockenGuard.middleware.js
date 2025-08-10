@@ -33,14 +33,22 @@ function tokenGuard(req, res, next) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
+        // const payload =  await jwtHelper.verifyToken(token);
+        // if(!payload) {
+        //     res.sendStatus(httpStatus.Unauthorized);
+        //     return
+        // }
+        // //ниже не знаю насколько корректно написал, но вроде вроде
+        // const id = payload as JwtPayload;
+        // //console.log('userId in authGuard middleware', payload, id,role);
+        // req.userId = id.toString();
+        // next()
         const payload = yield jwt_helper_1.jwtHelper.verifyToken(token);
-        if (!payload) {
+        if (!payload || typeof payload !== 'object' || !('userId' in payload)) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
-        const id = payload;
-        //console.log('userId in authGuard middleware', payload, id,role);
-        req.userId = id.toString();
+        req.userId = payload.userId;
         next();
     });
 }

@@ -22,12 +22,21 @@ function createCommentForPostHandler(req, res) {
             return;
         }
         const commentInput = req.body;
+        console.log('req.userId in post/comments');
+        if (!req.userId) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.BadRequest);
+            return;
+        }
         const commentator = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(req.userId);
-        const userInfo = {
+        if (!commentator) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
+            return;
+        }
+        const commentatorInfo = {
             userId: commentator.id,
             userLogin: commentator.login
         };
-        const createdId = yield commentService_bll_1.commentService.createComment(postId, commentInput, userInfo);
+        const createdId = yield commentService_bll_1.commentService.createComment(post.id, commentInput, commentatorInfo);
         const comment = yield queryRepo_repository_1.queryRepo.findCommentByIdOrFail(createdId);
         if (!comment) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
@@ -36,3 +45,4 @@ function createCommentForPostHandler(req, res) {
         res.status(httpStatuses_type_1.httpStatus.Created).send(comment);
     });
 }
+//вроде все ок, перепроверил

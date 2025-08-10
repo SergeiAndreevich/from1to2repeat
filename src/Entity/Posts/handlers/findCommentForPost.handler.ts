@@ -24,3 +24,4 @@ export async function findCommentForPostHandler(req:Request,res:Response) {
     }
     res.status(httpStatus.Ok).send(commentList)
 }
+//должно быть 200 и 404

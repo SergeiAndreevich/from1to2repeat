@@ -28,20 +28,13 @@ export const queryRepo = {
     async findUserByAuthOrFail(loginOrEmail:string, password: string):Promise<IResult<TypeUserViewModel | null>>{
         const user = await usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]});
         if(!user){
-            return {data: null, status: ResultStatuses.notFound}
+            return {data: null, status: ResultStatuses.unauthorized}
         }
         const isPasswordCorrect = await bcryptHelper.isPasswordCorrect(password, user.password);
         if(!isPasswordCorrect){
             return{data: null, status: ResultStatuses.unauthorized}
         }
         return {data: mapUserToView(user), status: ResultStatuses.success}
-    },
-    async findUserById(userId:string):Promise<TypeMeViewModel | null> {
-        const user = await usersCollection.findOne({});
-        if(!user){
-            return null
-        }
-        return mapMeToView(user)
     },
     async findBlogByIdOrFail(blogId:string):Promise<TypeBlogViewModel | null> {
         const blog = await blogsCollection.findOne({_id: new ObjectId(blogId)});

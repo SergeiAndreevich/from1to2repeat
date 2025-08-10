@@ -15,7 +15,7 @@ const SECRET_KEY = process.env.SECRET_KEY || 'hello';
 exports.jwtHelper = {
     createToken(user) {
         return __awaiter(this, void 0, void 0, function* () {
-            const data = { id: user.id };
+            const data = { userId: user.id };
             return (0, jsonwebtoken_1.sign)(data, SECRET_KEY, { expiresIn: '1h' });
         });
     },

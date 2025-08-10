@@ -1,4 +1,4 @@
-import {Router} from 'express';
+import {Router, Request,Response} from 'express';
 import {idValidation} from "../core/validation/paramsIdValidation.validation";
 import {basicGuard} from "../core/auth/basicGuard.middleware";
 import {checkValidationErrors} from "../core/errors/validationErrorResult.handler";
@@ -15,6 +15,8 @@ import {PostsSortFields} from "../core/pagination/pagination-and-sorting.types";
 import {getAllPostsHandler} from "../Entity/Posts/handlers/getAllPosts.handler";
 import {createCommentForPostHandler} from "../Entity/Posts/handlers/createCommentForPost.handler";
 import {findCommentForPostHandler} from "../Entity/Posts/handlers/findCommentForPost.handler";
+import {queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
+import {httpStatus} from "../core/types/httpStatuses.type";
 
 export const postsRouter = Router({});
 
@@ -26,3 +28,23 @@ postsRouter
     .delete('/:id', basicGuard, idValidation, checkValidationErrors, removePostHandler)
     .post('/:postId/comments', tokenGuard, postIdValidation, commentInputValidation, checkValidationErrors, createCommentForPostHandler)
     .get('/:postId/comments', postIdValidation, /*queryPaginationValidation(PostsSortFields),*/ checkValidationErrors, findCommentForPostHandler)
+    .post('/postId/test', tokenGuard, postIdValidation,commentInputValidation, checkValidationErrors, async(req:Request,res:Response)=>{
+        //получаем postId
+        const postId = req.params.postId;
+        const post = await queryRepo.findPostByIdOrFail(postId);
+        if(!post) {
+            res.sendStatus(httpStatus.NotFound);
+            return
+        }
+        const userId = req.userId;
+        if(!userId) {
+            res.sendStatus(httpStatus.Unauthorized);
+            return
+        }
+        const user = await queryRepo.findUserByIdOrFail(userId);
+        if(!user) {
+            res.sendStatus(httpStatus.NotFound);
+            return
+        }
+        res.status(httpStatus.Created).send({postId: post.id, userId: user.id});
+    })

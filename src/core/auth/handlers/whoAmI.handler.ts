@@ -1,6 +1,5 @@
 import {Request,Response} from "express";
 import {queryRepo} from "../../dataAcsessLayer/queryRepo.repository";
-import {pseudoRandomBytes} from "node:crypto";
 import {httpStatus} from "../../types/httpStatuses.type";
 
 export async function whoAmIHandler(req:Request, res:Response){
@@ -9,9 +8,9 @@ export async function whoAmIHandler(req:Request, res:Response){
         res.sendStatus(httpStatus.Unauthorized)
         return
     }
-    const user = await queryRepo.findUserById(userId);
+    const user = await queryRepo.findUserByIdOrFail(userId);
     if(!user){
-        res.sendStatus(httpStatus.InternalServerError)
+        res.sendStatus(httpStatus.ExtraError)
     }
     res.status(httpStatus.Ok).send(user)
 }

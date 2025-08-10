@@ -8,10 +8,10 @@ export async function authHandler(req:Request, res:Response){
     const result = await authService.checkUserInfo(req.body);
     switch (result.status) {
         case ResultStatuses.notFound:
-            res.status(httpStatus.NotFound);
+            res.sendStatus(httpStatus.NotFound);
             break
         case ResultStatuses.unauthorized:
-            res.status(httpStatus.Unauthorized);
+            res.sendStatus(httpStatus.Unauthorized);
             break
         case ResultStatuses.success:
             res.status(httpStatus.Ok).send({accessToken: result.data})

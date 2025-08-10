@@ -12,5 +12,5 @@ const removeCommentById_handler_1 = require("../Entity/Comments/handlers/removeC
 exports.commentsRouter = (0, express_1.Router)({});
 exports.commentsRouter
     .get('/:id', paramsIdValidation_validation_1.idValidation, validationErrorResult_handler_1.checkValidationErrors, getCommentById_handler_1.getCommentByIdHandler)
-    .put('/:commentId', tockenGuard_middleware_1.tokenGuard, paramsIdValidation_validation_1.idValidation, commentInputValidation_validation_1.commentInputValidation, validationErrorResult_handler_1.checkValidationErrors, updateComment_handler_1.updateCommentHandler)
-    .delete('/:commentId', tockenGuard_middleware_1.tokenGuard, paramsIdValidation_validation_1.idValidation, validationErrorResult_handler_1.checkValidationErrors, removeCommentById_handler_1.removeCommentByIdHandler);
+    .put('/:id', tockenGuard_middleware_1.tokenGuard, paramsIdValidation_validation_1.idValidation, commentInputValidation_validation_1.commentInputValidation, validationErrorResult_handler_1.checkValidationErrors, updateComment_handler_1.updateCommentHandler)
+    .delete('/:id', tockenGuard_middleware_1.tokenGuard, paramsIdValidation_validation_1.idValidation, validationErrorResult_handler_1.checkValidationErrors, removeCommentById_handler_1.removeCommentByIdHandler);

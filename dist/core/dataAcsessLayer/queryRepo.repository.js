@@ -16,7 +16,6 @@ const mapUserToView_mapper_1 = require("../mappers/mapUserToView.mapper");
 const ResultObject_type_1 = require("../types/ResultObject.type");
 const mapBlogToView_mapper_1 = require("../mappers/mapBlogToView.mapper");
 const bcrypt_helper_1 = require("../helpers/bcrypt.helper");
-const mapMeToView_mapper_1 = require("../mappers/mapMeToView.mapper");
 const mapPostToView_mapper_1 = require("../mappers/mapPostToView.mapper");
 const mapCommentToView_mapper_1 = require("../mappers/mapCommentToView.mapper");
 //не забудь потом вернуться к пагинации и поправить типы. Как в валидации, так и в приходящей dto
@@ -34,22 +33,13 @@ exports.queryRepo = {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield mongoDB_db_1.usersCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
             if (!user) {
-                return { data: null, status: ResultObject_type_1.ResultStatuses.notFound };
+                return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
             const isPasswordCorrect = yield bcrypt_helper_1.bcryptHelper.isPasswordCorrect(password, user.password);
             if (!isPasswordCorrect) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
             return { data: (0, mapUserToView_mapper_1.mapUserToView)(user), status: ResultObject_type_1.ResultStatuses.success };
-        });
-    },
-    findUserById(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const user = yield mongoDB_db_1.usersCollection.findOne({});
-            if (!user) {
-                return null;
-            }
-            return (0, mapMeToView_mapper_1.mapMeToView)(user);
         });
     },
     findBlogByIdOrFail(blogId) {
@@ -187,22 +177,22 @@ exports.queryRepo = {
     findCommentsByPostIdOrFail(dto, postId) {
         return __awaiter(this, void 0, void 0, function* () {
             const { pageNumber, pageSize, sortBy, sortDirection } = dto;
-            const skip = (+pageNumber - 1) * +pageSize;
+            const skip = (pageNumber - 1) * pageSize;
             const filter = { postId: postId };
             const items = yield mongoDB_db_1.commentsCollection
                 .find(filter)
                 .sort({ [sortBy]: sortDirection })
                 .skip(skip)
-                .limit(+pageSize)
+                .limit(pageSize)
                 .toArray();
             const totalCount = yield mongoDB_db_1.commentsCollection.countDocuments(filter);
             if (totalCount === 0) {
                 return null;
             }
             const commentsToView = {
-                pagesCount: Math.ceil(+totalCount / +pageSize),
-                page: +pageNumber,
-                pageSize: +pageSize,
+                pagesCount: Math.ceil(totalCount / pageSize),
+                page: pageNumber,
+                pageSize: pageSize,
                 totalCount: totalCount,
                 items: items.map((item) => (0, mapCommentToView_mapper_1.mapCommentToView)(item))
             };

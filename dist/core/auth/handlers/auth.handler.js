@@ -19,10 +19,10 @@ function authHandler(req, res) {
         const result = yield authService_bll_1.authService.checkUserInfo(req.body);
         switch (result.status) {
             case ResultObject_type_1.ResultStatuses.notFound:
-                res.status(httpStatuses_type_1.httpStatus.NotFound);
+                res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
                 break;
             case ResultObject_type_1.ResultStatuses.unauthorized:
-                res.status(httpStatuses_type_1.httpStatus.Unauthorized);
+                res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
                 break;
             case ResultObject_type_1.ResultStatuses.success:
                 res.status(httpStatuses_type_1.httpStatus.Ok).send({ accessToken: result.data });

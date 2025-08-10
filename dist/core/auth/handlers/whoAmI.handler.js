@@ -19,9 +19,9 @@ function whoAmIHandler(req, res) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
-        const user = yield queryRepo_repository_1.queryRepo.findUserById(userId);
+        const user = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(userId);
         if (!user) {
-            res.sendStatus(httpStatuses_type_1.httpStatus.InternalServerError);
+            res.sendStatus(httpStatuses_type_1.httpStatus.ExtraError);
         }
         res.status(httpStatuses_type_1.httpStatus.Ok).send(user);
     });

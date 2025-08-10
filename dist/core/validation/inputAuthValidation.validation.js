@@ -5,7 +5,9 @@ const express_validator_1 = require("express-validator");
 const loginOrEmail = (0, express_validator_1.body)('loginOrEmail')
     .exists().withMessage('loginOrEmail is required')
     .trim()
-    .isString().withMessage('loginOrEmail must be string');
+    .isString().withMessage('loginOrEmail must be string')
+    .isLength({ min: 1 })
+    .withMessage('It must be more than 1 symbol');
 const password = (0, express_validator_1.body)('password')
     .exists().withMessage('password is required')
     .isString()

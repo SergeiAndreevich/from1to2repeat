@@ -11,5 +11,5 @@ export const commentsRouter = Router({});
 
 commentsRouter
     .get('/:id', idValidation, checkValidationErrors, getCommentByIdHandler)
-    .put('/:commentId', tokenGuard, idValidation, commentInputValidation, checkValidationErrors, updateCommentHandler)
-    .delete('/:commentId', tokenGuard, idValidation, checkValidationErrors, removeCommentByIdHandler)
+    .put('/:id', tokenGuard, idValidation, commentInputValidation, checkValidationErrors, updateCommentHandler)
+    .delete('/:id', tokenGuard, idValidation, checkValidationErrors, removeCommentByIdHandler)

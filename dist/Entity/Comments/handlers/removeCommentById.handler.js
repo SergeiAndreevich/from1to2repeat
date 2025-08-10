@@ -12,10 +12,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeCommentByIdHandler = removeCommentByIdHandler;
 const commentService_bll_1 = require("../BLL/commentService.bll");
 const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
+const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.repository");
 function removeCommentByIdHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const commentId = req.params.commentId;
-        yield commentService_bll_1.commentService.removeComment(commentId);
-        res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
+        const commentId = req.params.id;
+        const userId = req.userId;
+        if (!userId) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
+            return;
+        }
+        const user = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(userId);
+        const comment = yield queryRepo_repository_1.queryRepo.findCommentByIdOrFail(commentId);
+        if (!user || !comment) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
+            return;
+        }
+        if (comment.commentatorInfo.userId === user.id) {
+            yield commentService_bll_1.commentService.removeComment(commentId);
+            res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
+            return;
+        }
+        res.sendStatus(httpStatuses_type_1.httpStatus.Forbidden);
     });
 }

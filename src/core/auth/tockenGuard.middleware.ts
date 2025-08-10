@@ -25,15 +25,22 @@ export async function tokenGuard(req: Request, res: Response, next: NextFunction
         return
     }
 
-    const payload =  await jwtHelper.verifyToken(token);
-    if(!payload) {
+    // const payload =  await jwtHelper.verifyToken(token);
+    // if(!payload) {
+    //     res.sendStatus(httpStatus.Unauthorized);
+    //     return
+    // }
+    // //ниже не знаю насколько корректно написал, но вроде вроде
+    // const id = payload as JwtPayload;
+    // //console.log('userId in authGuard middleware', payload, id,role);
+    // req.userId = id.toString();
+    // next()
+    const payload = await jwtHelper.verifyToken(token);
+    if (!payload || typeof payload !== 'object' || !('userId' in payload)) {
         res.sendStatus(httpStatus.Unauthorized);
         return
     }
-    //ниже не знаю насколько корректно написал, но вроде вроде
-    const id = payload as JwtPayload | string;
-    //console.log('userId in authGuard middleware', payload, id,role);
-    req.userId = id.toString();
+    req.userId = payload.userId;
     next()
 }
 

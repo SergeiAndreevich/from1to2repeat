@@ -19,9 +19,8 @@ exports.authService = {
             const { loginOrEmail, password } = info;
             const doesUserExist = yield queryRepo_repository_1.queryRepo.findUserByAuthOrFail(loginOrEmail, password);
             if (doesUserExist.status === ResultObject_type_1.ResultStatuses.success) {
-                const acsessToken = yield jwt_helper_1.jwtHelper.createToken(doesUserExist.data);
                 return {
-                    data: acsessToken,
+                    data: yield jwt_helper_1.jwtHelper.createToken(doesUserExist.data),
                     status: doesUserExist.status
                 };
             }

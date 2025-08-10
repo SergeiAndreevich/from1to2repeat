@@ -24,7 +24,7 @@ const websiteUrlValidation = (0, express_validator_1.body)('websiteUrl')
     .isString()
     .withMessage('websiteUrl should be string')
     .trim()
-    .isLength({ min: 11, max: 100 })
+    .isLength({ min: 1, max: 100 })
     .withMessage('Length of url must be >10 and <100')
     .isURL()
     .withMessage('It should be url');

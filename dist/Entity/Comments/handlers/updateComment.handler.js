@@ -16,12 +16,22 @@ const commentService_bll_1 = require("../BLL/commentService.bll");
 function updateCommentHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const commentId = req.params.id;
-        const comment = yield queryRepo_repository_1.queryRepo.findCommentByIdOrFail(commentId);
-        if (!comment) {
+        const userId = req.userId;
+        if (!userId) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
         }
-        yield commentService_bll_1.commentService.updateComment(commentId, req.body);
-        res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
+        const user = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(userId);
+        const comment = yield queryRepo_repository_1.queryRepo.findCommentByIdOrFail(commentId);
+        if (!user || !comment) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
+            return;
+        }
+        if (comment.commentatorInfo.userId === user.id) {
+            yield commentService_bll_1.commentService.updateComment(commentId, req.body);
+            res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
+            return;
+        }
+        res.sendStatus(httpStatuses_type_1.httpStatus.Forbidden);
     });
 }

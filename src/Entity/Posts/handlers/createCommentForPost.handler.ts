@@ -3,6 +3,7 @@ import {commentService} from "../../Comments/BLL/commentService.bll";
 import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 import {TypeCommentatorInfo, TypeCommentInputModel} from "../../Comments/Comment.types";
 import {httpStatus} from "../../../core/types/httpStatuses.type";
+import {ObjectId} from "mongodb";
 
 export async function createCommentForPostHandler(req:Request, res: Response) {
     const postId = req.params.postId;
@@ -12,7 +13,12 @@ export async function createCommentForPostHandler(req:Request, res: Response) {
         return
     }
     const commentInput:TypeCommentInputModel = req.body;
-    const commentator = await queryRepo.findUserByIdOrFail(req.userId!);
+    console.log('req.userId in post/comments');
+    if(!req.userId){
+        res.sendStatus(httpStatus.BadRequest);
+        return
+    }
+    const commentator = await queryRepo.findUserByIdOrFail(req.userId);
     if(!commentator){
         res.sendStatus(httpStatus.NotFound);
         return
@@ -21,7 +27,7 @@ export async function createCommentForPostHandler(req:Request, res: Response) {
         userId: commentator.id,
         userLogin: commentator.login
     }
-    const createdId = await commentService.createComment(postId, commentInput, commentatorInfo);
+    const createdId = await commentService.createComment(post.id, commentInput, commentatorInfo);
     const comment = await queryRepo.findCommentByIdOrFail(createdId);
     if(!comment) {
         res.sendStatus(httpStatus.NotFound);
