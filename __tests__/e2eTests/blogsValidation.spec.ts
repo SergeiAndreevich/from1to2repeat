@@ -31,4 +31,9 @@ describe('Blogs validation tests', () => {
             .send(testBlog).expect(httpStatus.Unauthorized)
     })
 
+    it('should not create a new blog', async () => {
+        const  response = await request(app).post(PATH.blogs).set('Authorization', createBasic())
+            .send({...testBlog, name:'abcdefjhijklmnopqrstuvwxyz'}).expect(httpStatus.Unauthorized)
+    })
+
 })
