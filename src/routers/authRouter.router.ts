@@ -13,6 +13,7 @@ import {registrationHandler} from "../core/auth/handlers/registration.handler";
 import {registrationConfirmationValidation} from "../core/validation/registrationConfirmationValidation.validation";
 import {emailValidation} from "../core/validation/emailValidation.validation";
 import {registrationConfirmationHandler} from "../core/auth/handlers/registrationConfirmation.handler";
+import {resendConfirmationHandler} from "../core/auth/handlers/resendConfirmation.handler";
 
 export const authRouter = Router({});
 

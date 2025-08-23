@@ -1,9 +1,9 @@
 import {TypeComment, TypeCommentatorInfo, TypeCommentInputModel} from "../Comment.types";
-import {repository} from "../../../core/dataAcsessLayer/repository.repository";
+import {commentRepository} from "../../../core/dataAcsessLayer/repository/commentRepository.repository";
 
 export const commentService = {
     async updateComment(commentId:string, dto: TypeCommentInputModel){
-        await repository.updateComment(commentId, dto);
+        await commentRepository.updateComment(commentId, dto);
         return
     },
     async createComment(postId:string, commentContent: TypeCommentInputModel, userInfo:TypeCommentatorInfo){
@@ -13,11 +13,11 @@ export const commentService = {
             createdAt: new Date(),
             postId: postId
         }
-        const createdId = await repository.createComment(comment);
+        const createdId = await commentRepository.createComment(comment);
         return createdId
     },
     async removeComment(commentId:string){
-        await repository.removeComment(commentId);
+        await commentRepository.removeComment(commentId);
         return
     }
 }

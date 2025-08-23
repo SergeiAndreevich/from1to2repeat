@@ -1,8 +1,8 @@
 import {TypeBlogPostInputModel, TypePost} from "../../Posts/Post.types";
 import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
-import {repository} from "../../../core/dataAcsessLayer/repository.repository";
 import {TypeBlog, TypeBlogInputModel} from "../Blog.types";
-import {blogsCollection} from "../../../core/db/mongoDB.db";
+import {postsRepository} from "../../../core/dataAcsessLayer/repository/postsRepository.repository";
+import {blogsRepository} from "../../../core/dataAcsessLayer/repository/blogsRepository.repository";
 
 export const blogsService = {
     async createPostForSpecificBlog(blogId: string, dto: TypeBlogPostInputModel) {
@@ -15,7 +15,7 @@ export const blogsService = {
             blogName: blog!.name,
             createdAt: blog!.createdAt
         }
-        const createdPostId = await repository.createPost(newPost);
+        const createdPostId = await postsRepository.createPost(newPost);
         return createdPostId
     },
     async createBlog(dto:TypeBlogInputModel){
@@ -26,14 +26,14 @@ export const blogsService = {
                 createdAt: new Date(),
                 isMembership: false
             }
-            const createdBlogId = await repository.createBlog(newBlog);
+            const createdBlogId = await blogsRepository.createBlog(newBlog);
             return createdBlogId
     },
     async updateBlog(blogId: string, dto: TypeBlogInputModel) {
-        return await repository.updateBlog(blogId, dto)
+        return await blogsRepository.updateBlog(blogId, dto)
     },
     async removeBlog(blogId: string){
-        await repository.removeBlog(blogId);
+        await blogsRepository.removeBlog(blogId);
         return
 
     }

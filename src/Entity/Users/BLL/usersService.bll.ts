@@ -3,14 +3,15 @@ import {bcryptHelper} from "../../../core/helpers/bcrypt.helper";
 import {repository} from "../../../core/dataAcsessLayer/repository.repository";
 import {IResult, ResultStatuses} from "../../../core/types/ResultObject.type";
 import {usersCollection} from "../../../core/db/mongoDB.db";
+import {usersRepository} from "../../../core/dataAcsessLayer/repository/usersRepository.repository";
 
 export const SALT_ROUNDS = 10;
 
 export const usersService = {
     async createUser(userInput: TypeUserInputModel): Promise<IResult<string | null>> {
         //проверяем, существует ли уже пользователь с такими login/email
-        const userByLogin = await repository.findUserByLoginOrFail(userInput.login);
-        const userByEmail = await repository.findUserByEmailOrFail(userInput.email);
+        const userByLogin = await usersRepository.findUserByLoginOrFail(userInput.login);
+        const userByEmail = await usersRepository.findUserByEmailOrFail(userInput.email);
         //если есть такой логин ИЛИ email, то возвращаем null и статус
         if( userByLogin.status === ResultStatuses.success) {
             return {data: null, status: ResultStatuses.alreadyExist}
@@ -30,7 +31,10 @@ export const usersService = {
         }
 
         //отправляем в БД, чтобы получить его id
-        const createdId:string = await repository.createUser(newUser);
+        const createdId:string = await usersRepository.createUser(newUser);
         return {data:createdId, status:ResultStatuses.success};
+    },
+    async confirmUser(code: string): Promise<IResult> {
+        return {data: null, status: ResultStatuses.alreadyExist}
     }
 }
