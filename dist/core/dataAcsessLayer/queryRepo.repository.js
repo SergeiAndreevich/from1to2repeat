@@ -35,7 +35,7 @@ exports.queryRepo = {
             if (!user) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
-            const isPasswordCorrect = yield bcrypt_helper_1.bcryptHelper.isPasswordCorrect(password, user.password);
+            const isPasswordCorrect = yield bcrypt_helper_1.bcryptHelper.isPasswordCorrect(password, user.accountData.password);
             if (!isPasswordCorrect) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
@@ -197,6 +197,21 @@ exports.queryRepo = {
                 items: items.map((item) => (0, mapCommentToView_mapper_1.mapCommentToView)(item))
             };
             return commentsToView;
+        });
+    },
+    checkEmailConfirmation(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield mongoDB_db_1.usersCollection.findOne({ "accountData.email": email });
+            if (!user) {
+                return null;
+            }
+            const emailIsConfirmed = yield mongoDB_db_1.usersCollection.findOne({
+                "accountData.email": email, "emailConfirmation.isConfirmed": false
+            });
+            if (!emailIsConfirmed) {
+                return null;
+            }
+            return (0, mapUserToView_mapper_1.mapUserToView)(emailIsConfirmed).email;
         });
     }
 };

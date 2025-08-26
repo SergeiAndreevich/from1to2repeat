@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeUserHandler = removeUserHandler;
 const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.repository");
-const repository_repository_1 = require("../../../core/dataAcsessLayer/repository.repository");
 const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
+const usersRepository_repository_1 = require("../../../core/dataAcsessLayer/repository/usersRepository.repository");
 function removeUserHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const userId = req.params.id;
@@ -22,7 +22,7 @@ function removeUserHandler(req, res) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;
         }
-        yield repository_repository_1.repository.removeUser(user.id);
+        yield usersRepository_repository_1.usersRepository.removeUser(user.id);
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
     });
 }

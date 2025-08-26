@@ -11,7 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsService = void 0;
 const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.repository");
-const repository_repository_1 = require("../../../core/dataAcsessLayer/repository.repository");
+const postsRepository_repository_1 = require("../../../core/dataAcsessLayer/repository/postsRepository.repository");
+const blogsRepository_repository_1 = require("../../../core/dataAcsessLayer/repository/blogsRepository.repository");
 exports.blogsService = {
     createPostForSpecificBlog(blogId, dto) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -24,7 +25,7 @@ exports.blogsService = {
                 blogName: blog.name,
                 createdAt: blog.createdAt
             };
-            const createdPostId = yield repository_repository_1.repository.createPost(newPost);
+            const createdPostId = yield postsRepository_repository_1.postsRepository.createPost(newPost);
             return createdPostId;
         });
     },
@@ -37,18 +38,18 @@ exports.blogsService = {
                 createdAt: new Date(),
                 isMembership: false
             };
-            const createdBlogId = yield repository_repository_1.repository.createBlog(newBlog);
+            const createdBlogId = yield blogsRepository_repository_1.blogsRepository.createBlog(newBlog);
             return createdBlogId;
         });
     },
     updateBlog(blogId, dto) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield repository_repository_1.repository.updateBlog(blogId, dto);
+            return yield blogsRepository_repository_1.blogsRepository.updateBlog(blogId, dto);
         });
     },
     removeBlog(blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield repository_repository_1.repository.removeBlog(blogId);
+            yield blogsRepository_repository_1.blogsRepository.removeBlog(blogId);
             return;
         });
     }

@@ -9,31 +9,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.commentService = void 0;
-const commentRepository_repository_1 = require("../../../core/dataAcsessLayer/repository/commentRepository.repository");
-exports.commentService = {
-    updateComment(commentId, dto) {
+exports.postsRepository = void 0;
+const mongoDB_db_1 = require("../../db/mongoDB.db");
+const mongodb_1 = require("mongodb");
+exports.postsRepository = {
+    createPost(newPost) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield commentRepository_repository_1.commentRepository.updateComment(commentId, dto);
+            const createdPost = yield mongoDB_db_1.postsCollection.insertOne(newPost);
+            return createdPost.insertedId.toString();
+        });
+    },
+    updatePost(id, newPost) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield mongoDB_db_1.postsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
+                $set: {
+                    title: newPost.title,
+                    shortDescription: newPost.shortDescription,
+                    content: newPost.content,
+                    blogId: newPost.blogId
+                }
+            });
             return;
         });
     },
-    createComment(postId, commentContent, userInfo) {
+    removePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comment = {
-                content: commentContent.content,
-                commentatorInfo: userInfo,
-                createdAt: new Date(),
-                postId: postId
-            };
-            const createdId = yield commentRepository_repository_1.commentRepository.createComment(comment);
-            return createdId;
-        });
-    },
-    removeComment(commentId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield commentRepository_repository_1.commentRepository.removeComment(commentId);
+            yield mongoDB_db_1.postsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return;
         });
-    }
+    },
 };

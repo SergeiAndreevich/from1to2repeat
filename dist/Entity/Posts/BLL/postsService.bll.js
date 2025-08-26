@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsService = void 0;
 const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.repository");
-const repository_repository_1 = require("../../../core/dataAcsessLayer/repository.repository");
+const postsRepository_repository_1 = require("../../../core/dataAcsessLayer/repository/postsRepository.repository");
 exports.postsService = {
     createPost(dto) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -24,19 +24,19 @@ exports.postsService = {
                 blogName: blog.name,
                 createdAt: blog.createdAt
             };
-            const createdId = yield repository_repository_1.repository.createPost(newPost);
+            const createdId = yield postsRepository_repository_1.postsRepository.createPost(newPost);
             return createdId;
         });
     },
     updatePost(postId, dto) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield repository_repository_1.repository.updatePost(postId, dto);
+            yield postsRepository_repository_1.postsRepository.updatePost(postId, dto);
             return;
         });
     },
     removePost(postId) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield repository_repository_1.repository.removePost(postId);
+            yield postsRepository_repository_1.postsRepository.removePost(postId);
             return;
         });
     }

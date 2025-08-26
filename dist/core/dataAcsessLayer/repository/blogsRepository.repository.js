@@ -9,31 +9,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.commentService = void 0;
-const commentRepository_repository_1 = require("../../../core/dataAcsessLayer/repository/commentRepository.repository");
-exports.commentService = {
-    updateComment(commentId, dto) {
+exports.blogsRepository = void 0;
+const mongoDB_db_1 = require("../../db/mongoDB.db");
+const mongodb_1 = require("mongodb");
+exports.blogsRepository = {
+    createBlog(blog) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield commentRepository_repository_1.commentRepository.updateComment(commentId, dto);
+            const newBlog = yield mongoDB_db_1.blogsCollection.insertOne(blog);
+            return newBlog.insertedId.toString();
+        });
+    },
+    updateBlog(id, newBlog) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield mongoDB_db_1.blogsCollection.updateOne({ _id: new mongodb_1.ObjectId(id) }, {
+                $set: {
+                    name: newBlog.name,
+                    description: newBlog.description,
+                    websiteUrl: newBlog.websiteUrl
+                }
+            });
             return;
         });
     },
-    createComment(postId, commentContent, userInfo) {
+    removeBlog(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const comment = {
-                content: commentContent.content,
-                commentatorInfo: userInfo,
-                createdAt: new Date(),
-                postId: postId
-            };
-            const createdId = yield commentRepository_repository_1.commentRepository.createComment(comment);
-            return createdId;
-        });
-    },
-    removeComment(commentId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield commentRepository_repository_1.commentRepository.removeComment(commentId);
+            yield mongoDB_db_1.blogsCollection.deleteOne({ _id: new mongodb_1.ObjectId(id) });
             return;
         });
-    }
+    },
 };
