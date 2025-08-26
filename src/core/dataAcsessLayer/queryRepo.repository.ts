@@ -1,7 +1,7 @@
 import {IPAginationAndSorting, PostsSortFields} from "../pagination/pagination-and-sorting.types";
 import {blogsCollection, commentsCollection, postsCollection, usersCollection} from "../db/mongoDB.db";
 import {ObjectId, WithId} from "mongodb";
-import {TypeUser, TypeUserViewModel} from "../../Entity/Users/User.types";
+import {TypeUser, TypeUserExtended, TypeUserViewModel} from "../../Entity/Users/User.types";
 import {mapUserToView} from "../mappers/mapUserToView.mapper";
 import {IResult, ResultStatuses} from "../types/ResultObject.type";
 import {TypePaginatorObject} from "../types/paginatorObject.type";
@@ -30,7 +30,7 @@ export const queryRepo = {
         if(!user){
             return {data: null, status: ResultStatuses.unauthorized}
         }
-        const isPasswordCorrect = await bcryptHelper.isPasswordCorrect(password, user.password);
+        const isPasswordCorrect = await bcryptHelper.isPasswordCorrect(password, user.accountData.password);
         if(!isPasswordCorrect){
             return{data: null, status: ResultStatuses.unauthorized}
         }
@@ -97,7 +97,7 @@ export const queryRepo = {
             page: pageNumber,
             pageSize: pageSize,
             totalCount: totalCount,
-            items: items.map((item: WithId<TypeUser>) => mapUserToView(item))
+            items: items.map((item: WithId<TypeUserExtended>) => mapUserToView(item))
         }
         return usersToView
     },
@@ -207,5 +207,18 @@ export const queryRepo = {
             items: items.map((item:WithId<TypeComment>)=> mapCommentToView(item))
         }
         return commentsToView
+    },
+    async checkEmailConfirmation(email:string){
+        const user = await usersCollection.findOne({"accountData.email": email});
+        if(!user) {
+            return null
+        }
+        const emailIsConfirmed = await usersCollection.findOne({
+            "accountData.email": email,   "emailConfirmation.isConfirmed": false
+        })
+        if(!emailIsConfirmed) {
+            return null
+        }
+        return mapUserToView(emailIsConfirmed).email
     }
 }

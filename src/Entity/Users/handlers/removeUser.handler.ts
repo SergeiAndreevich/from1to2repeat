@@ -5,6 +5,8 @@ import {TypeUserViewModel} from "../User.types";
 import {repository} from "../../../core/dataAcsessLayer/repository.repository";
 import * as http from "node:http";
 import {httpStatus} from "../../../core/types/httpStatuses.type";
+import {usersService} from "../BLL/usersService.bll";
+import {usersRepository} from "../../../core/dataAcsessLayer/repository/usersRepository.repository";
 export async function removeUserHandler(req:Request,res:Response) {
     const userId = req.params.id;
     const user:TypeUserViewModel|null = await queryRepo.findUserByIdOrFail(userId);
@@ -13,7 +15,7 @@ export async function removeUserHandler(req:Request,res:Response) {
         res.sendStatus(httpStatus.NotFound);
         return
     }
-    await repository.removeUser(user.id);
+    await usersRepository.removeUser(user.id);
     res.sendStatus(httpStatus.NoContent)
 }
 

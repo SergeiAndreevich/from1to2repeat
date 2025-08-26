@@ -7,7 +7,15 @@ export async function registrationConfirmationHandler(req:Request, res:Response)
     const code =  req.body;
     //204 если код подходит
     const result = await usersService.confirmUser(code);
-    if(result.status === ResultStatuses.error) {
+    if(result.status === ResultStatuses.unauthorized) {
+        res.sendStatus(httpStatus.BadRequest);
+        return
+    }
+    if(result.status === ResultStatuses.notFound) {
+        res.sendStatus(httpStatus.BadRequest);
+        return
+    }
+    if(result.status === ResultStatuses.alreadyExist) {
         res.sendStatus(httpStatus.BadRequest);
         return
     }

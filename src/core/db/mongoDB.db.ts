@@ -1,7 +1,7 @@
 import {Collection, Db, MongoClient} from "mongodb";
 import {TypeBlog} from "../../Entity/Blogs/Blog.types";
 import {TypePost} from "../../Entity/Posts/Post.types";
-import {TypeUser} from "../../Entity/Users/User.types";
+import {TypeUser, TypeUserExtended} from "../../Entity/Users/User.types";
 import {TypeComment} from "../../Entity/Comments/Comment.types";
 
 export const dbSettings = {
@@ -14,7 +14,7 @@ export const dbSettings = {
 export let client: MongoClient;
 export let blogsCollection: Collection<TypeBlog>;
 export let postsCollection: Collection<TypePost>;
-export let usersCollection: Collection<TypeUser>;
+export let usersCollection: Collection<TypeUserExtended>;
 export let commentsCollection: Collection<TypeComment>;
 
 export async function runDB(url:string):Promise<void> {
@@ -25,7 +25,7 @@ export async function runDB(url:string):Promise<void> {
 
     blogsCollection= db.collection<TypeBlog>('blogs');
     postsCollection= db.collection<TypePost>('posts');
-    usersCollection= db.collection<TypeUser>('users');
+    usersCollection= db.collection<TypeUserExtended>('users');
     commentsCollection= db.collection<TypeComment>('comments');
 
     //тестовое подключение
