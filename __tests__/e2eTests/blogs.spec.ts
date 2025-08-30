@@ -1,71 +1,72 @@
-import {setupApp} from "../../src/setup-app";
+// @ts-ignore
+import request from 'supertest';
+// @ts-ignore
 import express from "express";
+import {setupApp} from "../../src/setup-app";
 import {dbSettings, runDB} from "../../src/core/db/mongoDB.db";
 import {httpStatus} from "../../src/core/types/httpStatuses.type";
-import request from "supertest";
-import {PATH} from "../../src/core/path";
+import { PATH } from '../../src/core/path';
+// @ts-ignore
+import {basicToken} from "./helpers/createAuthHeader.helper";
+// @ts-ignore
+import {testBlogExample} from "./helpers/createTestObjects.helper";
 import {TypeBlogInputModel} from "../../src/Entity/Blogs/Blog.types";
 
-// @ts-ignore
-import {TestBlog} from "./helpers/createTestBlog.helper";
-// @ts-ignore
-import {createBasic} from "./helpers/createAuthHeader.helper";
+//структура респонса всегда имеет body
+//в get из-за пагинации еще вложенность body.items
 
 
-describe('Testing blogs', () => {
-    //подготовим приложение и БД для теста
+describe('test blogs', ()=>{
     const app = express();
     setupApp(app);
+
     beforeAll(async () => {
-        //включи докер
         await runDB(dbSettings.MONGO_URL);
-        await request(app).delete('testing/all-data').expect(httpStatus.NoContent)
-    })
-    afterAll(async () => {
-        await request(app).delete('testing/all-data').expect(httpStatus.NoContent)
-    })
+        await request(app).delete('/testing/all-data').expect(httpStatus.NoContent)
+    });
+    it('creates a new blog', async () => {
+         await request(app).post(PATH.blogs).set('Authorization', basicToken()).send(testBlogExample).expect(201);
+         //либо авторизироваться не может, либо не проходит валидацию
+    });
+    it('find all blogs', async () => {
+        await request(app).post(PATH.blogs).set('Authorization', basicToken()).send(testBlogExample).expect(httpStatus.Created);
+        const blogs = await request(app).get(PATH.blogs).set('Authorization', basicToken()).expect(httpStatus.Ok);
+        //console.log(blogs.body);
+        expect(blogs.body).toBeInstanceOf(Object);
+        expect(blogs.body.items.length).toBeGreaterThanOrEqual(2);
+    });
+    it('should change blog by id',  async () => {
+        const blogs = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
+        const id = blogs.body.items[0].id;
+        const updateData: TypeBlogInputModel = {
+            name: "new name",
+            description: "new description",
+            websiteUrl: "https://asd.ru"
+        };
+        await request(app).put(`${PATH.blogs}/${id}`).set('Authorization', basicToken()).send(updateData).expect(httpStatus.NoContent);
+        const blogResponse = await request(app).get(`${PATH.blogs}/${id}`).expect(httpStatus.Ok)
 
-    const testData:TypeBlogInputModel = {
-        name: 'TestBlogName',
-        description: 'Test blog description',
-        websiteUrl: 'https://example.com/blog'
-    }
+        expect(blogResponse.body).toEqual({
+            id: id,
+            name: updateData.name,
+            description: updateData.description,
+            websiteUrl: updateData.websiteUrl,
+            createdAt: expect.any(String),
+            isMembership: expect.any(Boolean)
+        });
 
-    // 1. Создаем блог 200, получаем список блогов 200
-    // 2. Создали блог 200, получили список блогов 200, изменили один блог 204, удалили блог 204
-    // 3. Получили список блогов 200, получили блог по id 200
-    // 4. Получили список блогов 200, создать блог без ключа 401, изменить блог без ключа 401, удалить без ключа 401
+    });
+    it('should remove blog by id',  async () => {
+        const blogs = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
+        const id = blogs.body.items[0].id;
+        await request(app)
+            .delete(`${PATH.blogs}/${id}`)
+            .set('Authorization', basicToken())
+            .expect(httpStatus.NoContent);
 
-    //начинаем писать e2e-тесты, а именно, последовательные
-    it('create and get new blog', async () => {
-        const blogResponse = await request(app).post(PATH.blogs).set('Authorization',createBasic())
-            .send(new TestBlog(testData)).expect(httpStatus.Created);
-        expect(blogResponse.body.name).toBe(testData.name);
-        const blogsList = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
-        expect(blogsList.body.items.length).toBeGreaterThanOrEqual(1)
-    })
-
-    it('create, get 2 blogs, update first and remove second', async () => {
-        const blogResponse = await request(app).post(PATH.blogs).set('Authorization',createBasic())
-            .send(new TestBlog({name: 'Second', description: 'Second', websiteUrl: 'https://example.com'})).expect(httpStatus.Created);
-        expect(blogResponse.body.name).toBe('Second');
-        const blogsList = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
-        expect(blogsList.body.items.length).toBeGreaterThanOrEqual(2);
-        await request(app).put(`${PATH.blogs}/${blogsList.body.items[0].id}`).set('Authorization',createBasic())
-            .send({name:'NewName', description:'New description', websiteUrl:'https://new.com'}).expect(httpStatus.NoContent);
-        await request(app).delete(`${PATH.blogs}/${blogsList.body.items[1].id}`).set('Authorization',createBasic()).expect(httpStatus.NoContent);
-    })
-    it('get changed blog by id', async ()=>{
-        const blogsList = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
-        const blog = await request(app).get(`${PATH.blogs}/${blogsList.body.items[0].id}`).expect(httpStatus.Ok);
-        expect(blog.body.name).toBe('NewName');
-    })
-    it('all unauthorized codes', async ()=>{
-        const blogsList = await request(app).get(PATH.blogs).expect(httpStatus.Ok);
-        await request(app).post(PATH.blogs)
-            .send(new TestBlog({name: 'Second', description: 'Second', websiteUrl: 'https://example.com'})).expect(httpStatus.Unauthorized);
-        await request(app).put(`${PATH.blogs}/${blogsList.body.items[0].id}`)
-            .send({name:'NewName', description:'New description', websiteUrl:'https://new.com'}).expect(httpStatus.Unauthorized);
-        await request(app).delete(`${PATH.blogs}/${blogsList.body.items[0].id}`).expect(httpStatus.Unauthorized);
-    })
+        await request(app)
+            .get(`${PATH.blogs}/${id}`)
+            .set('Authorization', basicToken())
+            .expect(httpStatus.NotFound);
+    });
 })

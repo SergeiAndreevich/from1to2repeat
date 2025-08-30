@@ -21,7 +21,9 @@ export async function registrationHandler(req: Request, res: Response): Promise<
     if(newUserResult.status === ResultStatuses.alreadyExist){
         res.sendStatus(httpStatus.Unauthorized);
         return
+
     }
+
     const user = await queryRepo.findUserByIdOrFail(newUserResult.data!);
     if(!user){
         res.sendStatus(httpStatus.ExtraError);

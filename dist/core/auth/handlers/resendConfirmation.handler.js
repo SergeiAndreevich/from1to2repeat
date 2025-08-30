@@ -16,7 +16,14 @@ function resendConfirmationHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const email = yield queryRepo_repository_1.queryRepo.checkEmailConfirmation(req.body);
         if (!email) {
-            res.sendStatus(httpStatuses_type_1.httpStatus.BadRequest);
+            res.status(httpStatuses_type_1.httpStatus.BadRequest).send({
+                errorsMessages: [
+                    {
+                        "message": "bad request",
+                        "field": "email"
+                    }
+                ]
+            });
             return;
         }
         res.status(httpStatuses_type_1.httpStatus.NoContent).send({ message: 'Confirmation code is re-sent' });

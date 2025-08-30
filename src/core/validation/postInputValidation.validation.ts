@@ -34,7 +34,7 @@ const blogIdValidation =  body("blogId")
     .isString()
     .withMessage("BlogId must be a string")
     .isMongoId()
-    .withMessage("BlogId must be a mongpID")
+    .withMessage("BlogId must be a mongoID")
     .trim()
     .custom(async (value) => {
         // value - это значение blogId, которое нужно проверить

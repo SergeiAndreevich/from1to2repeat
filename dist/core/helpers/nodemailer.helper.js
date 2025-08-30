@@ -34,12 +34,10 @@ exports.nodemailerHelper = {
                 to: email,
                 subject: "Подтверждение email",
                 html: `
-        <h2>Добро пожаловать!</h2>
-        <p>Подтвердите ваш email, чтобы завершить регистрацию:</p>
-        <a href="https://nodejsdev.ru/guides/webdraftt/email/">
-  Подтвердить email
-</a>
-      `,
+                <h1>Thanks for your registration</h1>
+                <p>To finish registration please follow the link below:
+                    <a href='https://somesite.com/confirm-email?code=your_confirmation_code'>complete registration</a>
+                </p>`,
             });
         });
     }

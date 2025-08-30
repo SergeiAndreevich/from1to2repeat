@@ -5,7 +5,14 @@ import {httpStatus} from "../../types/httpStatuses.type";
 export async function resendConfirmationHandler(req:Request, res: Response) {
     const email = await queryRepo.checkEmailConfirmation(req.body);
     if(!email) {
-        res.sendStatus(httpStatus.BadRequest);
+        res.status(httpStatus.BadRequest).send({
+            errorsMessages: [
+                {
+                    "message": "bad request",
+                    "field": "email"
+                }
+            ]
+        });
         return
     }
     res.status(httpStatus.NoContent).send({message: 'Confirmation code is re-sent'})

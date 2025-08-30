@@ -38,6 +38,6 @@ const createErrorMessage = (errors: TypeMyError[]):TypeErrorsStore => {
         errorsMessages: errors
     }
 }
-type TypeErrorsStore = {
+export type TypeErrorsStore = {
     errorsMessages: TypeMyError[]
 }
