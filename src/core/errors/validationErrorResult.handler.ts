@@ -20,7 +20,7 @@ export const checkValidationErrors =
     next()
 }
 
-type TypeMyError = {
+export type TypeMyError = {
     message: string,
     field: string
 }

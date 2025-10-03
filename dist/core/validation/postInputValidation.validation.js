@@ -42,7 +42,7 @@ const blogIdValidation = (0, express_validator_1.body)("blogId")
     .isString()
     .withMessage("BlogId must be a string")
     .isMongoId()
-    .withMessage("BlogId must be a mongpID")
+    .withMessage("BlogId must be a mongoID")
     .trim()
     .custom((value) => __awaiter(void 0, void 0, void 0, function* () {
     // value - это значение blogId, которое нужно проверить

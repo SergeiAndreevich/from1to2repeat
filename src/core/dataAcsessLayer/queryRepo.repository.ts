@@ -26,7 +26,12 @@ export const queryRepo = {
         return mapUserToView(user)
     },
     async findUserByAuthOrFail(loginOrEmail:string, password: string):Promise<IResult<TypeUserViewModel | null>>{
-        const user = await usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]});
+        const user = await usersCollection.findOne({
+            $or: [
+                { "accountData.login": loginOrEmail },
+                { "accountData.email": loginOrEmail }
+            ]
+        });
         if(!user){
             return {data: null, status: ResultStatuses.unauthorized}
         }
@@ -209,16 +214,15 @@ export const queryRepo = {
         return commentsToView
     },
     async checkEmailConfirmation(email:string){
+        //нашли юзера по email
         const user = await usersCollection.findOne({"accountData.email": email});
         if(!user) {
             return null
         }
-        const emailIsConfirmed = await usersCollection.findOne({
-            "accountData.email": email,   "emailConfirmation.isConfirmed": false
-        })
-        if(!emailIsConfirmed) {
+        //если почта уже подтверждена, то никакого resendingConfirmationCode и не требуется
+        if(user.emailConfirmation.isConfirmed) {
             return null
         }
-        return mapUserToView(emailIsConfirmed).email
+        return mapUserToView(user).email
     }
 }

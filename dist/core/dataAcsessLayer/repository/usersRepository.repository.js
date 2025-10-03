@@ -16,7 +16,7 @@ const mongodb_1 = require("mongodb");
 exports.usersRepository = {
     findUserByLoginOrFail(userLogin) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield mongoDB_db_1.usersCollection.findOne({ login: userLogin });
+            const user = yield mongoDB_db_1.usersCollection.findOne({ "accountData.login": userLogin });
             if (!user) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.notFound };
             }
@@ -25,7 +25,7 @@ exports.usersRepository = {
     },
     findUserByEmailOrFail(userEmail) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield mongoDB_db_1.usersCollection.findOne({ email: userEmail });
+            const user = yield mongoDB_db_1.usersCollection.findOne({ "accountData.email": userEmail });
             if (!user) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.notFound };
             }
@@ -51,33 +51,27 @@ exports.usersRepository = {
                 "emailConfirmation.confirmationCode": code
             });
             if (!user) {
-                return { data: null, status: ResultObject_type_1.ResultStatuses.notFound };
+                return { data: null, status: ResultObject_type_1.ResultStatuses.notFound, errorMessage: { field: 'code', message: 'code not found' } };
             }
             //ищем юзера по коду и сроку истечения кода - истек? Неавторизован
-            const actualUser = yield mongoDB_db_1.usersCollection.findOne({
-                "emailConfirmation.confirmationCode": code,
-                "emailConfirmation.expirationDate": { $gt: new Date() }
-            });
-            if (!actualUser) {
-                return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
+            if (user.emailConfirmation.expirationDate < new Date()) {
+                return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized, errorMessage: { field: 'code', message: 'code expired' } };
             }
             //проверяем, чтобы почта не была уже подтвержденной
-            const confirmedUser = yield mongoDB_db_1.usersCollection.findOne({
-                "emailConfirmation.confirmationCode": code,
-                "emailConfirmation.expirationDate": { $gt: new Date() },
-                "emailConfirmation.isConfirmed": true
-            });
-            if (confirmedUser) {
-                return { data: null, status: ResultObject_type_1.ResultStatuses.alreadyExist };
+            if (user.emailConfirmation.isConfirmed) {
+                //изначально я поле ошибки я написал email и из-за этого тест падал
+                return { data: null, status: ResultObject_type_1.ResultStatuses.alreadyExist, errorMessage: { field: 'code', message: 'email already exists and is confirmed' } };
             }
             //обновляем данные для юзера, если все четко
-            yield mongoDB_db_1.usersCollection.updateOne({
-                "emailConfirmation.confirmationCode": code,
-                "emailConfirmation.expirationDate": { $gt: new Date() }
-            }, {
-                $set: { "emailConfirmation.isConfirmed": true }
-            });
+            yield mongoDB_db_1.usersCollection.updateOne({ _id: user._id }, { $set: { "emailConfirmation.isConfirmed": true } });
             return { data: null, status: ResultObject_type_1.ResultStatuses.success };
+        });
+    },
+    updateConfirmationCode(email, code) {
+        return __awaiter(this, void 0, void 0, function* () {
+            //обновляем данные для юзера
+            yield mongoDB_db_1.usersCollection.updateOne({ "accountData.email": email }, { $set: { "emailConfirmation.confirmationCode": code } });
+            return;
         });
     }
 };

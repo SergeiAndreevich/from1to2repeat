@@ -18,12 +18,18 @@ import {resendConfirmationHandler} from "../core/auth/handlers/resendConfirmatio
 export const authRouter = Router({});
 
 authRouter
-    .get('/me', tokenGuard, whoAmIHandler)
-    .post('/login',inputAuthValidation, checkValidationErrors, authHandler)
-    .post('/registration-confirmation', registrationConfirmationValidation, checkValidationErrors, registrationConfirmationHandler)
-    .post('/registration', inputRegistrationValidation, checkValidationErrors, registrationHandler)
-    .post('/registration-email-resending', emailValidation, checkValidationErrors, resendConfirmationHandler)
-    // .post('/login', inputAuthValidation, checkValidationErrors, async(req:Request,res:Response)=>{
+    .get('/me', tokenGuard, whoAmIHandler) //получаем инфо о себе
+    .post('/login',inputAuthValidation, checkValidationErrors, authHandler) //залогинились и получили jwt-token
+    .post('/registration-confirmation', registrationConfirmationValidation, checkValidationErrors, registrationConfirmationHandler) //подтвердили почту
+    .post('/registration', inputRegistrationValidation, checkValidationErrors, registrationHandler) //зарегались и получили письмо с кодом подтверждения
+    .post('/registration-email-resending', emailValidation, checkValidationErrors, resendConfirmationHandler) //переотправили письмо с кодом
+
+
+
+
+
+
+// .post('/login', inputAuthValidation, checkValidationErrors, async(req:Request,res:Response)=>{
     //     const user = await authService.checkUserInfo(req.body);
     //     console.log(user);
     //     if(user.status ===  ResultStatuses.success){

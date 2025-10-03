@@ -10,7 +10,7 @@ export async function createUserHandler(req:Request, res: Response) {
     const userInput:TypeUserInputModel = req.body;
 
     //передаем их в БЛЛ и просим создать юзера, результатом создания является id
-    const newUserResult = await usersService.createUser(userInput);
+    const newUserResult = await usersService.createUserBySuperAdmin(userInput);
 
     //результат работы по созданию юзера
     if(newUserResult.status === ResultStatuses.alreadyExist){

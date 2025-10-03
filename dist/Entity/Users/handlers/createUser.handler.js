@@ -19,7 +19,7 @@ function createUserHandler(req, res) {
         //получили данные из req body
         const userInput = req.body;
         //передаем их в БЛЛ и просим создать юзера, результатом создания является id
-        const newUserResult = yield usersService_bll_1.usersService.createUser(userInput);
+        const newUserResult = yield usersService_bll_1.usersService.createUserBySuperAdmin(userInput);
         //результат работы по созданию юзера
         if (newUserResult.status === ResultObject_type_1.ResultStatuses.alreadyExist) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);

@@ -1,7 +1,7 @@
 export interface IResult<T=null>{
     data: T,
     status: ResultStatuses,
-    errorMessage?: string;
+    errorMessage?: object;
 
 }
 export enum ResultStatuses {

@@ -15,11 +15,11 @@ const registrationConfirmation_handler_1 = require("../core/auth/handlers/regist
 const resendConfirmation_handler_1 = require("../core/auth/handlers/resendConfirmation.handler");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter
-    .get('/me', tockenGuard_middleware_1.tokenGuard, whoAmI_handler_1.whoAmIHandler)
-    .post('/login', inputAuthValidation_validation_1.inputAuthValidation, validationErrorResult_handler_1.checkValidationErrors, auth_handler_1.authHandler)
-    .post('/registration-confirmation', registrationConfirmationValidation_validation_1.registrationConfirmationValidation, validationErrorResult_handler_1.checkValidationErrors, registrationConfirmation_handler_1.registrationConfirmationHandler)
-    .post('/registration', inputRegistrationValidation_validation_1.inputRegistrationValidation, validationErrorResult_handler_1.checkValidationErrors, registration_handler_1.registrationHandler)
-    .post('/registration-email-resending', emailValidation_validation_1.emailValidation, validationErrorResult_handler_1.checkValidationErrors, resendConfirmation_handler_1.resendConfirmationHandler);
+    .get('/me', tockenGuard_middleware_1.tokenGuard, whoAmI_handler_1.whoAmIHandler) //получаем инфо о себе
+    .post('/login', inputAuthValidation_validation_1.inputAuthValidation, validationErrorResult_handler_1.checkValidationErrors, auth_handler_1.authHandler) //залогинились и получили jwt-token
+    .post('/registration-confirmation', registrationConfirmationValidation_validation_1.registrationConfirmationValidation, validationErrorResult_handler_1.checkValidationErrors, registrationConfirmation_handler_1.registrationConfirmationHandler) //подтвердили почту
+    .post('/registration', inputRegistrationValidation_validation_1.inputRegistrationValidation, validationErrorResult_handler_1.checkValidationErrors, registration_handler_1.registrationHandler) //зарегались и получили письмо с кодом подтверждения
+    .post('/registration-email-resending', emailValidation_validation_1.emailValidation, validationErrorResult_handler_1.checkValidationErrors, resendConfirmation_handler_1.resendConfirmationHandler); //переотправили письмо с кодом
 // .post('/login', inputAuthValidation, checkValidationErrors, async(req:Request,res:Response)=>{
 //     const user = await authService.checkUserInfo(req.body);
 //     console.log(user);

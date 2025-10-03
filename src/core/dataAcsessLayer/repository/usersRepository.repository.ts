@@ -6,14 +6,14 @@ import {usersService} from "../../../Entity/Users/BLL/usersService.bll";
 
 export const usersRepository = {
     async findUserByLoginOrFail(userLogin: string): Promise<IResult<string | null>> {
-        const user = await usersCollection.findOne({login: userLogin});
+        const user = await usersCollection.findOne({"accountData.login": userLogin});
         if (!user) {
             return {data: null, status: ResultStatuses.notFound}
         }
         return {data: user._id.toString(), status: ResultStatuses.success}
     },
     async findUserByEmailOrFail(userEmail: string): Promise<IResult<string | null>> {
-        const user = await usersCollection.findOne({email: userEmail});
+        const user = await usersCollection.findOne({"accountData.email": userEmail});
         if (!user) {
             return {data: null, status: ResultStatuses.notFound}
         }
@@ -27,40 +27,39 @@ export const usersRepository = {
         await usersCollection.deleteOne({_id: new ObjectId(userId)})
         return
     },
-    async confirmEmailByCode(code:string){
+    async confirmEmailByCode(code:string):Promise<IResult<string | null>> {
         //ищем юзера по коду. Если нет - не найден
         const user = await usersCollection.findOne({
             "emailConfirmation.confirmationCode": code
         })
         if (!user) {
-            return {data: null, status: ResultStatuses.notFound}
+            return {data: null, status: ResultStatuses.notFound, errorMessage: {field: 'code', message: 'code not found'}};
         }
+
         //ищем юзера по коду и сроку истечения кода - истек? Неавторизован
-        const actualUser = await usersCollection.findOne({
-            "emailConfirmation.confirmationCode": code,
-            "emailConfirmation.expirationDate": { $gt: new Date() }
-        })
-        if (!actualUser) {
-            return {data: null, status: ResultStatuses.unauthorized}
+        if (user.emailConfirmation.expirationDate < new Date()){
+            return {data: null, status: ResultStatuses.unauthorized, errorMessage: {field: 'code', message: 'code expired'}}
         }
+
         //проверяем, чтобы почта не была уже подтвержденной
-        const confirmedUser = await usersCollection.findOne({
-            "emailConfirmation.confirmationCode": code,
-            "emailConfirmation.expirationDate": { $gt: new Date()},
-            "emailConfirmation.isConfirmed": true
-        })
-        if (confirmedUser) {
-            return {data: null, status: ResultStatuses.alreadyExist}
+        if (user.emailConfirmation.isConfirmed){
+            //изначально я поле ошибки я написал email и из-за этого тест падал
+            return {data: null, status: ResultStatuses.alreadyExist, errorMessage: {field: 'code', message: 'email already exists and is confirmed'}};
         }
 
         //обновляем данные для юзера, если все четко
-        await usersCollection.updateOne(  {
-                "emailConfirmation.confirmationCode": code,
-                "emailConfirmation.expirationDate": { $gt: new Date() }
-            },
-            {
-                $set: { "emailConfirmation.isConfirmed": true }
-            })
+        await usersCollection.updateOne(
+            { _id: user._id },
+            { $set: { "emailConfirmation.isConfirmed": true }}
+        )
         return  {data: null, status: ResultStatuses.success}
+    },
+    async updateConfirmationCode(email: string, code:string): Promise<void> {
+        //обновляем данные для юзера
+        await usersCollection.updateOne(
+            { "accountData.email": email },
+            { $set: { "emailConfirmation.confirmationCode": code }}
+        )
+        return
     }
 }

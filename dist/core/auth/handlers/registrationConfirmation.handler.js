@@ -13,23 +13,30 @@ exports.registrationConfirmationHandler = registrationConfirmationHandler;
 const usersService_bll_1 = require("../../../Entity/Users/BLL/usersService.bll");
 const httpStatuses_type_1 = require("../../types/httpStatuses.type");
 const ResultObject_type_1 = require("../../types/ResultObject.type");
+const createErrorsMessage_function_1 = require("../../errors/createErrorsMessage.function");
 function registrationConfirmationHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const code = req.body;
+        const { code } = req.body; // ✅ достаём строку
+        console.log('🔍 Confirmation attempt with code:', code, typeof code);
         //204 если код подходит
         const result = yield usersService_bll_1.usersService.confirmUser(code);
+        console.log('🔍 Confirmation result:', result.status);
         if (result.status === ResultObject_type_1.ResultStatuses.unauthorized) {
-            res.sendStatus(httpStatuses_type_1.httpStatus.BadRequest);
+            console.log('❌ Code expired');
+            res.status(httpStatuses_type_1.httpStatus.BadRequest).send((0, createErrorsMessage_function_1.createErrorsMessages)(result.errorMessage));
             return;
         }
         if (result.status === ResultObject_type_1.ResultStatuses.notFound) {
-            res.sendStatus(httpStatuses_type_1.httpStatus.BadRequest);
+            console.log('❌ Code not found');
+            res.status(httpStatuses_type_1.httpStatus.BadRequest).send((0, createErrorsMessage_function_1.createErrorsMessages)(result.errorMessage));
             return;
         }
         if (result.status === ResultObject_type_1.ResultStatuses.alreadyExist) {
-            res.sendStatus(httpStatuses_type_1.httpStatus.BadRequest);
+            console.log('❌ Already confirmed');
+            res.status(httpStatuses_type_1.httpStatus.BadRequest).send((0, createErrorsMessage_function_1.createErrorsMessages)(result.errorMessage));
             return;
         }
+        console.log('✅ Email confirmed successfully');
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
         //400 если код не подходит, истек или уже был применен
     });

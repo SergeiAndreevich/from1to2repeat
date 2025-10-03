@@ -31,7 +31,12 @@ exports.queryRepo = {
     },
     findUserByAuthOrFail(loginOrEmail, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield mongoDB_db_1.usersCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] });
+            const user = yield mongoDB_db_1.usersCollection.findOne({
+                $or: [
+                    { "accountData.login": loginOrEmail },
+                    { "accountData.email": loginOrEmail }
+                ]
+            });
             if (!user) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
@@ -201,17 +206,16 @@ exports.queryRepo = {
     },
     checkEmailConfirmation(email) {
         return __awaiter(this, void 0, void 0, function* () {
+            //нашли юзера по email
             const user = yield mongoDB_db_1.usersCollection.findOne({ "accountData.email": email });
             if (!user) {
                 return null;
             }
-            const emailIsConfirmed = yield mongoDB_db_1.usersCollection.findOne({
-                "accountData.email": email, "emailConfirmation.isConfirmed": false
-            });
-            if (!emailIsConfirmed) {
+            //если почта уже подтверждена, то никакого resendingConfirmationCode и не требуется
+            if (user.emailConfirmation.isConfirmed) {
                 return null;
             }
-            return (0, mapUserToView_mapper_1.mapUserToView)(emailIsConfirmed).email;
+            return (0, mapUserToView_mapper_1.mapUserToView)(user).email;
         });
     }
 };
