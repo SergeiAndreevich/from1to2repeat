@@ -14,15 +14,20 @@ import {registrationConfirmationValidation} from "../core/validation/registratio
 import {emailValidation} from "../core/validation/emailValidation.validation";
 import {registrationConfirmationHandler} from "../core/auth/handlers/registrationConfirmation.handler";
 import {resendConfirmationHandler} from "../core/auth/handlers/resendConfirmation.handler";
+import {refreshHandler} from "../core/auth/handlers/refreshToken.handler";
+import {logoutHandler} from "../core/auth/handlers/logout.handler";
 
 export const authRouter = Router({});
 
 authRouter
     .get('/me', tokenGuard, whoAmIHandler) //получаем инфо о себе
-    .post('/login',inputAuthValidation, checkValidationErrors, authHandler) //залогинились и получили jwt-token
+    .post('/login',inputAuthValidation, checkValidationErrors, authHandler) //залогинились и получили jwt-token и refreshToken
     .post('/registration-confirmation', registrationConfirmationValidation, checkValidationErrors, registrationConfirmationHandler) //подтвердили почту
     .post('/registration', inputRegistrationValidation, checkValidationErrors, registrationHandler) //зарегались и получили письмо с кодом подтверждения
     .post('/registration-email-resending', emailValidation, checkValidationErrors, resendConfirmationHandler) //переотправили письмо с кодом
+    .post('/resresh-token', tokenGuard, refreshHandler) //выдаем новый рефреш-токен по старому
+    .post('/logout',tokenGuard, logoutHandler) //протухаем рефреш токен и больше не выдаем новых
+
 
 
 

@@ -13,21 +13,63 @@ exports.authService = void 0;
 const queryRepo_repository_1 = require("../../dataAcsessLayer/queryRepo.repository");
 const ResultObject_type_1 = require("../../types/ResultObject.type");
 const jwt_helper_1 = require("../../helpers/jwt.helper");
+const authRepository_repository_1 = require("../../dataAcsessLayer/repository/authRepository.repository");
 exports.authService = {
     checkUserInfo(info) {
         return __awaiter(this, void 0, void 0, function* () {
+            //проверяем, есть ли такой юзер и совпадают ли данные аутентификации
             const { loginOrEmail, password } = info;
             const doesUserExist = yield queryRepo_repository_1.queryRepo.findUserByAuthOrFail(loginOrEmail, password);
-            if (doesUserExist.status === ResultObject_type_1.ResultStatuses.success) {
+            //если не удалась аутентификация, то прерываем процесс авторизации
+            if (doesUserExist.status !== ResultObject_type_1.ResultStatuses.success) {
                 return {
-                    data: yield jwt_helper_1.jwtHelper.createToken(doesUserExist.data),
+                    data: null,
                     status: doesUserExist.status
                 };
             }
+            // создаем пару AccessToken и RefreshToken
+            const userId = doesUserExist.data.id;
+            const accessToken = yield jwt_helper_1.jwtHelper.generateAccessToken(userId);
+            const { refreshToken, jti } = yield jwt_helper_1.jwtHelper.generateRefreshToken(userId);
+            //сохраняем в БД
+            const decodedRefresh = yield jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
+            const tokenToDb = {
+                jti,
+                userId,
+                expiresAt: new Date(decodedRefresh.exp * 1000),
+                revoked: false
+            };
+            yield authRepository_repository_1.authRepo.addRefreshToken(tokenToDb);
             return {
-                data: null,
+                data: { accessToken, refreshToken },
                 status: doesUserExist.status
             };
+        });
+    },
+    updateRefreshToken(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            //раскукоживаем рефреш-токен и получаем оттуда данные
+            const decodedRefresh = yield jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
+            if (!decodedRefresh) {
+                return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized, errorMessage: { field: 'refreshToken', message: 'Refresh token is empty' } };
+            }
+            //идем в БД и проверяем, актуальный ли у нас рефреш-токен
+            //изменяем в БД данные по старому рефреш-токену
+            //создаем новую пару аксес-рефреш токенов
+            //выдаем их как результат
+            //а уже в хендлере аксес-токен отдаем в боди, а в куки зашиваем новый рефреш
+            const result = yield authRepository_repository_1.authRepo.updateTokens(decodedRefresh);
+            return { data: result.data, status: result.status, errorMessage: result.errorMessage };
+        });
+    },
+    removeRefreshToken(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const decodedRefresh = yield jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
+            if (!decodedRefresh) {
+                return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized, errorMessage: { field: 'refreshToken', message: 'Refresh token is empty' } };
+            }
+            const result = yield authRepository_repository_1.authRepo.removeRefreshToken(decodedRefresh);
+            return { data: result.data, status: result.status };
         });
     }
 };

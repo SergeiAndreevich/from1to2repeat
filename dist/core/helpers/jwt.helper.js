@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jwtHelper = void 0;
 const jsonwebtoken_1 = require("jsonwebtoken");
+const uuid_1 = require("uuid");
 const SECRET_KEY = process.env.SECRET_KEY || 'hello';
 exports.jwtHelper = {
     createToken(user) {
@@ -23,6 +24,29 @@ exports.jwtHelper = {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 return (0, jsonwebtoken_1.verify)(userToken, SECRET_KEY);
+            }
+            catch (error) {
+                console.error(`In jwt middleware has dropped an error: ${error}`);
+                return null;
+            }
+        });
+    },
+    generateAccessToken(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return (0, jsonwebtoken_1.sign)({ userId }, SECRET_KEY, { expiresIn: '10s' });
+        });
+    },
+    generateRefreshToken(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const jti = (0, uuid_1.v4)();
+            const refreshToken = (0, jsonwebtoken_1.sign)({ userId, jti }, SECRET_KEY, { expiresIn: '20s' });
+            return { refreshToken, jti };
+        });
+    },
+    verifyRefreshToken(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return (0, jsonwebtoken_1.verify)(refreshToken, process.env.JWT_REFRESH_SECRET);
             }
             catch (error) {
                 console.error(`In jwt middleware has dropped an error: ${error}`);

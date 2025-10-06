@@ -21,8 +21,10 @@ const postsRouter_router_1 = require("./routers/postsRouter.router");
 const testingRouter_router_1 = require("./routers/testingRouter.router");
 const usersRouter_router_1 = require("./routers/usersRouter.router");
 const commentsRouter_router_1 = require("./routers/commentsRouter.router");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const setupApp = (app) => {
     app.use(express_1.default.json());
+    app.use((0, cookie_parser_1.default)());
     app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).send(`Go to ${path_1.PATH.docs}`);
     }));

@@ -14,7 +14,13 @@ export async function authHandler(req:Request, res:Response){
             res.sendStatus(httpStatus.Unauthorized);
             break
         case ResultStatuses.success:
-            res.status(httpStatus.Ok).send({accessToken: result.data})
+            res.cookie("refresh_token", result.data!.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+                maxAge: 20 * 1000 // 20 secund в ms
+            });
+            res.status(httpStatus.Ok).send({accessToken: result.data!.accessToken})
             break
         default:
             res.sendStatus(httpStatus.InternalServerError)

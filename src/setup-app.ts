@@ -6,9 +6,11 @@ import {postsRouter} from "./routers/postsRouter.router";
 import {testingRouter} from "./routers/testingRouter.router";
 import {usersRouter} from "./routers/usersRouter.router";
 import {commentsRouter} from "./routers/commentsRouter.router";
+import cookieParser from "cookie-parser";
 
 export const setupApp =(app: Express)=>{
     app.use(express.json());
+    app.use(cookieParser());
     app.get('/', async (req: Request ,res: Response)=>{
         res.status(200).send(`Go to ${PATH.docs}`)
     });

@@ -25,7 +25,13 @@ function authHandler(req, res) {
                 res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
                 break;
             case ResultObject_type_1.ResultStatuses.success:
-                res.status(httpStatuses_type_1.httpStatus.Ok).send({ accessToken: result.data });
+                res.cookie("refresh_token", result.data.refreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "lax",
+                    maxAge: 20 * 1000 // 20 secund в ms
+                });
+                res.status(httpStatuses_type_1.httpStatus.Ok).send({ accessToken: result.data.accessToken });
                 break;
             default:
                 res.sendStatus(httpStatuses_type_1.httpStatus.InternalServerError);

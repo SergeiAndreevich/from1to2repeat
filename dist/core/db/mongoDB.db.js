@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = exports.client = exports.dbSettings = void 0;
+exports.authCollection = exports.commentsCollection = exports.usersCollection = exports.postsCollection = exports.blogsCollection = exports.client = exports.dbSettings = void 0;
 exports.runDB = runDB;
 const mongodb_1 = require("mongodb");
 exports.dbSettings = {
@@ -27,6 +27,7 @@ function runDB(url) {
         exports.postsCollection = db.collection('posts');
         exports.usersCollection = db.collection('users');
         exports.commentsCollection = db.collection('comments');
+        exports.authCollection = db.collection('auth');
         //тестовое подключение
         try {
             yield exports.client.connect();

@@ -3,6 +3,7 @@ import {TypeBlog} from "../../Entity/Blogs/Blog.types";
 import {TypePost} from "../../Entity/Posts/Post.types";
 import {TypeUser, TypeUserExtended} from "../../Entity/Users/User.types";
 import {TypeComment} from "../../Entity/Comments/Comment.types";
+import {TypeAccessDataModel} from "../dataAcsessLayer/repository/authRepository.repository";
 
 export const dbSettings = {
     PORT: process.env.PORT || 5005,
@@ -16,6 +17,7 @@ export let blogsCollection: Collection<TypeBlog>;
 export let postsCollection: Collection<TypePost>;
 export let usersCollection: Collection<TypeUserExtended>;
 export let commentsCollection: Collection<TypeComment>;
+export let authCollection: Collection<TypeAccessDataModel>;
 
 export async function runDB(url:string):Promise<void> {
     //инициализация подключения к Монго, а именно к нашей БД
@@ -27,6 +29,7 @@ export async function runDB(url:string):Promise<void> {
     postsCollection= db.collection<TypePost>('posts');
     usersCollection= db.collection<TypeUserExtended>('users');
     commentsCollection= db.collection<TypeComment>('comments');
+    authCollection= db.collection<TypeAccessDataModel>('auth');
 
     //тестовое подключение
     try{
