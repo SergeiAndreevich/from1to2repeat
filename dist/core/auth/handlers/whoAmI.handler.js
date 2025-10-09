@@ -22,7 +22,8 @@ function whoAmIHandler(req, res) {
         const user = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(userId);
         if (!user) {
             res.sendStatus(httpStatuses_type_1.httpStatus.ExtraError);
+            return;
         }
-        res.status(httpStatuses_type_1.httpStatus.Ok).send(user);
+        res.status(httpStatuses_type_1.httpStatus.Ok).send({ email: user === null || user === void 0 ? void 0 : user.email, login: user === null || user === void 0 ? void 0 : user.login, userId: user === null || user === void 0 ? void 0 : user.id });
     });
 }

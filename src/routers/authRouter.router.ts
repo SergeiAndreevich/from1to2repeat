@@ -25,11 +25,12 @@ authRouter
     .post('/registration-confirmation', registrationConfirmationValidation, checkValidationErrors, registrationConfirmationHandler) //подтвердили почту
     .post('/registration', inputRegistrationValidation, checkValidationErrors, registrationHandler) //зарегались и получили письмо с кодом подтверждения
     .post('/registration-email-resending', emailValidation, checkValidationErrors, resendConfirmationHandler) //переотправили письмо с кодом
-    .post('/resresh-token', tokenGuard, refreshHandler) //выдаем новый рефреш-токен по старому
-    .post('/logout',tokenGuard, logoutHandler) //протухаем рефреш токен и больше не выдаем новых
+    .post('/refresh-token', refreshHandler) //выдаем новый рефреш-токен по старому
+    .post('/logout', logoutHandler) //протухаем рефреш токен и больше не выдаем новых
 
-
-
+// Нужно разрешить доступ к маршруту /auth/refresh-token без JWT-проверки.
+// Туда человек приходит как раз тогда, когда у него access-токен просрочен, чтобы обновить его через refresh-токен.
+// У меня сначала стоял там токен-гуард, вероятно из-за этого шли прахом все тесты
 
 
 

@@ -16,20 +16,23 @@ const ResultObject_type_1 = require("../../types/ResultObject.type");
 function logoutHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         // check actual token
-        const refreshToken = req.cookies.refresh_token;
+        //console.log('LOGOUT DEBUGGER STARTED');
+        const refreshToken = req.cookies.refreshToken;
+        //console.log('refreshToken', refreshToken);
         if (!refreshToken) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
         // вносим изменения в БД, т.е. протухаем существующий токен
         const result = yield authService_bll_1.authService.removeRefreshToken(refreshToken);
+        //console.log('result', result);
         //проверяем статус того че пришло из БД
         if (result.status !== ResultObject_type_1.ResultStatuses.success) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
         //очищаем куки и возвращаем ответочку
-        res.clearCookie("refresh_token");
+        res.clearCookie("refreshToken");
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
     });
 }

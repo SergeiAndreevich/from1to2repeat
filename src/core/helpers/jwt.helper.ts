@@ -10,7 +10,7 @@ export const jwtHelper = {
         const data = {userId: user.id}
         return sign(data, SECRET_KEY,{expiresIn: '1h'} );
     },
-    async verifyToken(userToken: string):Promise<string | JwtPayload | null> {
+    verifyToken(userToken: string):string | JwtPayload | null {
         try{
             return verify(userToken, SECRET_KEY);
         }
@@ -19,21 +19,20 @@ export const jwtHelper = {
             return  null
         }
     },
-    async generateAccessToken(userId:string){
+    generateAccessToken(userId:string){
         return sign({userId}, SECRET_KEY, {expiresIn: '10s'} );
     },
-    async generateRefreshToken(userId: string) {
+    generateRefreshToken(userId: string) {
         const jti = uuidv4();
         const refreshToken = sign({userId, jti}, SECRET_KEY, {expiresIn: '20s'} );
         return {refreshToken, jti}
     },
-    async verifyRefreshToken(refreshToken: string):Promise<JwtPayload | null> {
+    verifyRefreshToken(refreshToken: string):JwtPayload | null {
         try{
-            return verify(refreshToken, process.env.JWT_REFRESH_SECRET as string) as JwtPayload;        }
+            return verify(refreshToken, SECRET_KEY) as JwtPayload;        }
         catch(error) {
             console.error(`In jwt middleware has dropped an error: ${error}`);
             return  null
         }
-
     }
 }

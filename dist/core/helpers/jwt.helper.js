@@ -21,37 +21,29 @@ exports.jwtHelper = {
         });
     },
     verifyToken(userToken) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return (0, jsonwebtoken_1.verify)(userToken, SECRET_KEY);
-            }
-            catch (error) {
-                console.error(`In jwt middleware has dropped an error: ${error}`);
-                return null;
-            }
-        });
+        try {
+            return (0, jsonwebtoken_1.verify)(userToken, SECRET_KEY);
+        }
+        catch (error) {
+            console.error(`In jwt middleware has dropped an error: ${error}`);
+            return null;
+        }
     },
     generateAccessToken(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return (0, jsonwebtoken_1.sign)({ userId }, SECRET_KEY, { expiresIn: '10s' });
-        });
+        return (0, jsonwebtoken_1.sign)({ userId }, SECRET_KEY, { expiresIn: '10s' });
     },
     generateRefreshToken(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const jti = (0, uuid_1.v4)();
-            const refreshToken = (0, jsonwebtoken_1.sign)({ userId, jti }, SECRET_KEY, { expiresIn: '20s' });
-            return { refreshToken, jti };
-        });
+        const jti = (0, uuid_1.v4)();
+        const refreshToken = (0, jsonwebtoken_1.sign)({ userId, jti }, SECRET_KEY, { expiresIn: '20s' });
+        return { refreshToken, jti };
     },
     verifyRefreshToken(refreshToken) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return (0, jsonwebtoken_1.verify)(refreshToken, process.env.JWT_REFRESH_SECRET);
-            }
-            catch (error) {
-                console.error(`In jwt middleware has dropped an error: ${error}`);
-                return null;
-            }
-        });
+        try {
+            return (0, jsonwebtoken_1.verify)(refreshToken, SECRET_KEY);
+        }
+        catch (error) {
+            console.error(`In jwt middleware has dropped an error: ${error}`);
+            return null;
+        }
     }
 };

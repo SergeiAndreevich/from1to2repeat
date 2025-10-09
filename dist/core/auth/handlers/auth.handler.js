@@ -15,8 +15,9 @@ const ResultObject_type_1 = require("../../types/ResultObject.type");
 const httpStatuses_type_1 = require("../../types/httpStatuses.type");
 function authHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        //проверяем, есть ли такой юзер. Если есть и все данные сходятся - выдаем токен
+        //проверяем, есть ли такой юзер. Если есть и все данные сходятся - выдаем токены
         const result = yield authService_bll_1.authService.checkUserInfo(req.body);
+        //console.log("DEBUG result in authHandler:", result);
         switch (result.status) {
             case ResultObject_type_1.ResultStatuses.notFound:
                 res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
@@ -25,9 +26,11 @@ function authHandler(req, res) {
                 res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
                 break;
             case ResultObject_type_1.ResultStatuses.success:
-                res.cookie("refresh_token", result.data.refreshToken, {
+                //console.log("DEBUG sending tokens:", result.data);
+                res.cookie("refreshToken", result.data.refreshToken, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
+                    //secure: process.env.NODE_ENV === 'production',
+                    secure: true,
                     sameSite: "lax",
                     maxAge: 20 * 1000 // 20 secund в ms
                 });

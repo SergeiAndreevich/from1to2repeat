@@ -20,6 +20,7 @@ exports.authService = {
             //проверяем, есть ли такой юзер и совпадают ли данные аутентификации
             const { loginOrEmail, password } = info;
             const doesUserExist = yield queryRepo_repository_1.queryRepo.findUserByAuthOrFail(loginOrEmail, password);
+            //console.log("DEBUG doesUserExist:", doesUserExist);
             //если не удалась аутентификация, то прерываем процесс авторизации
             if (doesUserExist.status !== ResultObject_type_1.ResultStatuses.success) {
                 return {
@@ -29,10 +30,17 @@ exports.authService = {
             }
             // создаем пару AccessToken и RefreshToken
             const userId = doesUserExist.data.id;
-            const accessToken = yield jwt_helper_1.jwtHelper.generateAccessToken(userId);
-            const { refreshToken, jti } = yield jwt_helper_1.jwtHelper.generateRefreshToken(userId);
+            const accessToken = jwt_helper_1.jwtHelper.generateAccessToken(userId);
+            const { refreshToken, jti } = jwt_helper_1.jwtHelper.generateRefreshToken(userId);
+            //console.log("DEBUG accessToken:", accessToken);
+            //console.log("DEBUG refreshToken:", refreshToken);
             //сохраняем в БД
-            const decodedRefresh = yield jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
+            const decodedRefresh = jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
+            //console.log("DEBUG decodedRefresh:", decodedRefresh);
+            // if (!payload || typeof payload !== 'object' || !('userId' in payload)) {
+            //     res.sendStatus(httpStatus.Unauthorized);
+            //     return
+            // }
             const tokenToDb = {
                 jti,
                 userId,
@@ -49,7 +57,7 @@ exports.authService = {
     updateRefreshToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             //раскукоживаем рефреш-токен и получаем оттуда данные
-            const decodedRefresh = yield jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
+            const decodedRefresh = jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
             if (!decodedRefresh) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized, errorMessage: { field: 'refreshToken', message: 'Refresh token is empty' } };
             }
@@ -64,7 +72,7 @@ exports.authService = {
     },
     removeRefreshToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            const decodedRefresh = yield jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
+            const decodedRefresh = jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
             if (!decodedRefresh) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized, errorMessage: { field: 'refreshToken', message: 'Refresh token is empty' } };
             }

@@ -16,18 +16,33 @@ export const authRepo = {
         return
     },
     async updateTokens(refreshToken: JwtPayload):Promise<IResult<null | {accessToken: string, refreshToken: string}>>{
-        //ищем и проверяем на актуальность введенный рефреш-токен
+        //1️⃣ ищем и проверяем на актуальность введенный рефреш-токен
         const oldRefreshToken = await authCollection.findOne({jti: refreshToken.jti});
         if(!oldRefreshToken) {
             return {data: null, status: ResultStatuses.unauthorized}
         }
-        if(oldRefreshToken!.expiresAt < refreshToken.expiresAt){
-            return {data: null, status: ResultStatuses.unauthorized}
+        // 2️⃣ если токен уже отозван — сразу 401
+        if (oldRefreshToken.revoked) {
+            return { data: null, status: ResultStatuses.unauthorized };
         }
-        //протухаем старый рефреш-токен
-        await authCollection.updateOne({jti: refreshToken.jti},{$set: {
-            revoked: true
-        }});
+        // 3️⃣ проверяем, не истёк ли токен (сравниваем корректно)
+        const now = new Date();
+        if (oldRefreshToken.expiresAt.getTime() < now.getTime()) {
+            return { data: null, status: ResultStatuses.unauthorized };
+        }
+        // 🧠 Что происходит
+        // Ты сравниваешь:
+        // oldRefreshToken.expiresAt — дата в формате Date, хранящаяся в БД;
+        // refreshToken.expiresAt — число в секундах UNIX, пришедшее из JWT.
+        // Эти значения никогда не совпадут по масштабу (у одного миллисекунды, у другого секунды),
+        // поэтому почти всегда условие oldRefreshToken!.expiresAt < refreshToken.expiresAt → true,
+        // и ты возвращаешь unauthorized.
+
+        // 4️⃣ протухаем старый рефреш-токен
+        await authCollection.updateOne(
+            {jti: refreshToken.jti},
+            {$set: { revoked: true}}
+        );
         //создаем новую пару аксес-рефреш
         const newAccessToken = await jwtHelper.generateAccessToken(oldRefreshToken.userId);
         const newRefreshToken = await jwtHelper.generateRefreshToken(oldRefreshToken.userId);
@@ -49,7 +64,11 @@ export const authRepo = {
         if(!oldRefreshToken) {
             return {data: null, status: ResultStatuses.unauthorized}
         }
-        if(oldRefreshToken!.expiresAt < token.expiresAt){
+        // 🔥 если токен уже отозван
+        if (oldRefreshToken.revoked) {
+            return { data: null, status: ResultStatuses.unauthorized };
+        }
+        if(oldRefreshToken!.expiresAt.getTime() < new Date().getTime()) {
             return {data: null, status: ResultStatuses.unauthorized}
         }
         //протухаем старый рефреш-токен

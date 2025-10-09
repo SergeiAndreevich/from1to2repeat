@@ -10,6 +10,7 @@ export const authService = {
         //проверяем, есть ли такой юзер и совпадают ли данные аутентификации
         const {loginOrEmail, password} = info;
         const doesUserExist = await queryRepo.findUserByAuthOrFail(loginOrEmail, password);
+        //console.log("DEBUG doesUserExist:", doesUserExist);
 
         //если не удалась аутентификация, то прерываем процесс авторизации
         if(doesUserExist.status !== ResultStatuses.success){
@@ -21,11 +22,21 @@ export const authService = {
 
         // создаем пару AccessToken и RefreshToken
         const userId = doesUserExist.data!.id;
-        const accessToken = await jwtHelper.generateAccessToken(userId);
-        const {refreshToken, jti} = await jwtHelper.generateRefreshToken(userId);
+        const accessToken = jwtHelper.generateAccessToken(userId);
+        const {refreshToken, jti} = jwtHelper.generateRefreshToken(userId);
 
+
+        //console.log("DEBUG accessToken:", accessToken);
+        //console.log("DEBUG refreshToken:", refreshToken);
         //сохраняем в БД
-        const decodedRefresh = await jwtHelper.verifyRefreshToken(refreshToken);
+        const decodedRefresh = jwtHelper.verifyRefreshToken(refreshToken);
+        //console.log("DEBUG decodedRefresh:", decodedRefresh);
+
+        // if (!payload || typeof payload !== 'object' || !('userId' in payload)) {
+        //     res.sendStatus(httpStatus.Unauthorized);
+        //     return
+        // }
+
         const tokenToDb:TypeAccessDataModel = {
             jti,
             userId,
@@ -42,7 +53,7 @@ export const authService = {
     },
     async updateRefreshToken(refreshToken:string): Promise<IResult<null | {accessToken: string, refreshToken: string}>> {
         //раскукоживаем рефреш-токен и получаем оттуда данные
-        const decodedRefresh = await jwtHelper.verifyRefreshToken(refreshToken);
+        const decodedRefresh = jwtHelper.verifyRefreshToken(refreshToken);
         if(!decodedRefresh){
             return {data: null, status: ResultStatuses.unauthorized, errorMessage: {field: 'refreshToken', message: 'Refresh token is empty'}};
         }
@@ -55,7 +66,7 @@ export const authService = {
         return {data: result.data, status: result.status, errorMessage: result.errorMessage}
     },
     async removeRefreshToken(refreshToken:string): Promise<IResult<null>> {
-        const decodedRefresh = await jwtHelper.verifyRefreshToken(refreshToken);
+        const decodedRefresh = jwtHelper.verifyRefreshToken(refreshToken);
         if(!decodedRefresh){
             return {data: null, status: ResultStatuses.unauthorized, errorMessage: {field: 'refreshToken', message: 'Refresh token is empty'}};
         }

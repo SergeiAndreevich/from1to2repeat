@@ -22,8 +22,11 @@ exports.authRouter
     .post('/registration-confirmation', registrationConfirmationValidation_validation_1.registrationConfirmationValidation, validationErrorResult_handler_1.checkValidationErrors, registrationConfirmation_handler_1.registrationConfirmationHandler) //подтвердили почту
     .post('/registration', inputRegistrationValidation_validation_1.inputRegistrationValidation, validationErrorResult_handler_1.checkValidationErrors, registration_handler_1.registrationHandler) //зарегались и получили письмо с кодом подтверждения
     .post('/registration-email-resending', emailValidation_validation_1.emailValidation, validationErrorResult_handler_1.checkValidationErrors, resendConfirmation_handler_1.resendConfirmationHandler) //переотправили письмо с кодом
-    .post('/resresh-token', tockenGuard_middleware_1.tokenGuard, refreshToken_handler_1.refreshHandler) //выдаем новый рефреш-токен по старому
-    .post('/logout', tockenGuard_middleware_1.tokenGuard, logout_handler_1.logoutHandler); //протухаем рефреш токен и больше не выдаем новых
+    .post('/refresh-token', refreshToken_handler_1.refreshHandler) //выдаем новый рефреш-токен по старому
+    .post('/logout', logout_handler_1.logoutHandler); //протухаем рефреш токен и больше не выдаем новых
+// Нужно разрешить доступ к маршруту /auth/refresh-token без JWT-проверки.
+// Туда человек приходит как раз тогда, когда у него access-токен просрочен, чтобы обновить его через refresh-токен.
+// У меня сначала стоял там токен-гуард, вероятно из-за этого шли прахом все тесты
 // .post('/login', inputAuthValidation, checkValidationErrors, async(req:Request,res:Response)=>{
 //     const user = await authService.checkUserInfo(req.body);
 //     console.log(user);
