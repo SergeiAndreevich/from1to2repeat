@@ -1,12 +1,11 @@
-import {TypeAuthInputModel} from "../auth.types";
+import {TypeAuthInputModel, TypeSessionInputData, TypeSessionModel} from "../auth.types";
 import {queryRepo} from "../../dataAcsessLayer/queryRepo.repository";
 import {IResult, ResultStatuses} from "../../types/ResultObject.type";
 import {jwtHelper} from "../../helpers/jwt.helper";
-import {authRepo, TypeAccessDataModel} from "../../dataAcsessLayer/repository/authRepository.repository";
-import {httpStatus} from "../../types/httpStatuses.type";
+import {authRepo} from "../../dataAcsessLayer/repository/authRepository.repository";
 
 export const authService = {
-    async checkUserInfo(info: TypeAuthInputModel):Promise<IResult<{accessToken:string,refreshToken:string } | null>>{
+    async checkUserInfo(info: TypeAuthInputModel, dataToDb: TypeSessionInputData):Promise<IResult<{accessToken:string,refreshToken:string } | null>>{
         //проверяем, есть ли такой юзер и совпадают ли данные аутентификации
         const {loginOrEmail, password} = info;
         const doesUserExist = await queryRepo.findUserByAuthOrFail(loginOrEmail, password);
@@ -31,19 +30,30 @@ export const authService = {
         //сохраняем в БД
         const decodedRefresh = jwtHelper.verifyRefreshToken(refreshToken);
         //console.log("DEBUG decodedRefresh:", decodedRefresh);
-
+        if(!decodedRefresh){
+            return {data:null, status: ResultStatuses.error}
+        }
         // if (!payload || typeof payload !== 'object' || !('userId' in payload)) {
         //     res.sendStatus(httpStatus.Unauthorized);
         //     return
         // }
-
-        const tokenToDb:TypeAccessDataModel = {
-            jti,
+        //раньше сохраняли вот так, а теперь через сессию
+        // const tokenToDb:TypeAccessDataModel = {
+        //     jti,
+        //     userId,
+        //     expiresAt: new Date(decodedRefresh!.exp!* 1000),
+        //     revoked: false
+        // }
+        const session:TypeSessionModel = {
             userId,
-            expiresAt: new Date(decodedRefresh!.exp!* 1000),
+            deviceId: jti,
+            ip: dataToDb.ip,
+            deviceName: dataToDb.deviceName,
+            lastActivity: new Date(decodedRefresh.iat!*1000),
+            expiresAt: new Date(decodedRefresh.exp!*1000),
             revoked: false
         }
-        await authRepo.addRefreshToken(tokenToDb);
+        await authRepo.addSession(session);
 
 
         return {

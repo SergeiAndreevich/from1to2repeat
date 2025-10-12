@@ -12,7 +12,7 @@ export async function refreshHandler(req: Request, res: Response){
     const refreshToken = req.cookies.refreshToken;
     //console.log('DUBUGGER REFRESH-TOKEN', refreshToken);
     if(!refreshToken){
-        console.log('refreshToken is empty');
+        //console.log('refreshToken is empty');
         res.sendStatus(httpStatus.Unauthorized);
         return
     }

@@ -2,6 +2,7 @@ import {authCollection} from "../../db/mongoDB.db";
 import {JwtPayload} from "jsonwebtoken";
 import {IResult, ResultStatuses} from "../../types/ResultObject.type";
 import {jwtHelper} from "../../helpers/jwt.helper";
+import {TypeSessionModel, TypeSessionUpdateModel} from "../../auth/auth.types";
 
 export type TypeAccessDataModel = {
     jti: string;
@@ -11,8 +12,22 @@ export type TypeAccessDataModel = {
 }
 
 export const authRepo = {
-    async addRefreshToken(data: TypeAccessDataModel){
+    // async addRefreshToken(data: TypeAccessDataModel){
+    //     await authCollection.insertOne(data)
+    //     return
+    // },
+    async addSession(data: TypeSessionModel){
         await authCollection.insertOne(data)
+        return
+    },
+    async updateSession(session: TypeSessionUpdateModel){
+        await authCollection.updateOne({userId: session.userId}, {
+            $set: {
+                deviceId: session.deviceId,
+                lastActivity: session.lastActivity,
+                expiresAt: session.expiresAt
+            }
+        })
         return
     },
     async updateTokens(refreshToken: JwtPayload):Promise<IResult<null | {accessToken: string, refreshToken: string}>>{
@@ -44,23 +59,23 @@ export const authRepo = {
             {$set: { revoked: true}}
         );
         //создаем новую пару аксес-рефреш
-        const newAccessToken = await jwtHelper.generateAccessToken(oldRefreshToken.userId);
-        const newRefreshToken = await jwtHelper.generateRefreshToken(oldRefreshToken.userId);
+        const newAccessToken = jwtHelper.generateAccessToken(oldRefreshToken.userId);
+        const newRefreshToken = jwtHelper.generateRefreshToken(oldRefreshToken.userId);
 
         //сохраняем в БД
-        const decodedRefresh = await jwtHelper.verifyRefreshToken(newRefreshToken.refreshToken);
-        const tokenToDb:TypeAccessDataModel = {
-            jti: newRefreshToken.jti,
+        const decodedRefresh =  jwtHelper.verifyRefreshToken(newRefreshToken.refreshToken);
+        const update:TypeSessionUpdateModel = {
+            deviceId: newRefreshToken.jti,
             userId: oldRefreshToken.userId,
             expiresAt: new Date(decodedRefresh!.exp!* 1000),
-            revoked: false
+            lastActivity: new Date(decodedRefresh!.iat!* 1000)
         }
-        await authRepo.addRefreshToken(tokenToDb);
+        await authRepo.updateSession(update);
         return  {data: {accessToken: newAccessToken, refreshToken: newRefreshToken.refreshToken}, status: ResultStatuses.success}
     },
     async removeRefreshToken(token: JwtPayload):Promise<IResult<null>>{
         //ищем и проверяем на актуальность введенный рефреш-токен
-        const oldRefreshToken = await authCollection.findOne({jti: token.jti});
+        const oldRefreshToken = await authCollection.findOne({deviceId: token.jti});
         if(!oldRefreshToken) {
             return {data: null, status: ResultStatuses.unauthorized}
         }
@@ -72,7 +87,7 @@ export const authRepo = {
             return {data: null, status: ResultStatuses.unauthorized}
         }
         //протухаем старый рефреш-токен
-        await authCollection.updateOne({jti: token.jti},{$set: {
+        await authCollection.updateOne({deviceId: token.jti},{$set: {
                 revoked: true
         }});
         return {data: null, status: ResultStatuses.success}

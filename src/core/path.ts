@@ -6,4 +6,5 @@ export const PATH = {
     auth: '/auth',
     users: '/users',
     comments: '/comments',
+    security: '/security',
 }

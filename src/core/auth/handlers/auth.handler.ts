@@ -4,8 +4,14 @@ import {ResultStatuses} from "../../types/ResultObject.type";
 import {httpStatus} from "../../types/httpStatuses.type";
 
 export async function authHandler(req:Request, res:Response){
+    const ip = req.ip;
+    if(!ip){
+        res.sendStatus(httpStatus.Forbidden);
+        return
+    }
+    const deviceName = req.headers['user-agent']  || 'Unknown device';
     //проверяем, есть ли такой юзер. Если есть и все данные сходятся - выдаем токены
-    const result = await authService.checkUserInfo(req.body);
+    const result = await authService.checkUserInfo(req.body, {ip, deviceName});
     //console.log("DEBUG result in authHandler:", result);
     switch (result.status) {
         case ResultStatuses.notFound:

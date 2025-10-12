@@ -12,15 +12,15 @@ export async function registrationHandler(req: Request, res: Response): Promise<
     // код в ссылке как квери-параметр, например, ляляля?code=yourcode
     //ну и 400, еслу юзер уже есть (а также если некорректный инпут)
 
-    console.log('=== REGISTRATION DEBUG ===');
-    console.log('1. NODE_ENV:', process.env.NODE_ENV);
+    //console.log('=== REGISTRATION DEBUG ===');
+    //console.log('1. NODE_ENV:', process.env.NODE_ENV);
 
     const userInput:TypeUserInputModel = req.body;
-    console.log('2. User input:', userInput);
+    //console.log('2. User input:', userInput);
 
     //передаем их в БЛЛ и просим создать юзера, результатом создания является id
     const newUserResult = await usersService.createUser(userInput);
-    console.log('3. Service result status:', newUserResult);
+    //console.log('3. Service result status:', newUserResult);
 
     //результат работы по созданию юзера
     if(newUserResult.status === ResultStatuses.alreadyExist){
@@ -28,13 +28,13 @@ export async function registrationHandler(req: Request, res: Response): Promise<
         return
     }
     const user = await queryRepo.findUserByIdOrFail(newUserResult.data!.id);
-    console.log('4. User found:', user);
+    //console.log('4. User found:', user);
     if(!user){
         res.sendStatus(httpStatus.ExtraError);
         return
     }
 
-    console.log('5. 🔒 Sending response WITHOUT code for production');
+    //console.log('5. 🔒 Sending response WITHOUT code for production');
         res.sendStatus(httpStatus.NoContent);
 
     //res.sendStatus(204)
