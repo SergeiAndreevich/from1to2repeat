@@ -15,9 +15,14 @@ const ResultObject_type_1 = require("../../types/ResultObject.type");
 const httpStatuses_type_1 = require("../../types/httpStatuses.type");
 function authHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
+        const ip = req.ip;
+        if (!ip) {
+            res.sendStatus(httpStatuses_type_1.httpStatus.Forbidden);
+            return;
+        }
+        const deviceName = req.headers['user-agent'] || 'Unknown device';
         //проверяем, есть ли такой юзер. Если есть и все данные сходятся - выдаем токены
-        const result = yield authService_bll_1.authService.checkUserInfo(req.body);
-        //console.log("DEBUG result in authHandler:", result);
+        const result = yield authService_bll_1.authService.checkUserInfo(req.body, { ip, deviceName });
         switch (result.status) {
             case ResultObject_type_1.ResultStatuses.notFound:
                 res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
@@ -26,15 +31,14 @@ function authHandler(req, res) {
                 res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
                 break;
             case ResultObject_type_1.ResultStatuses.success:
-                //console.log("DEBUG sending tokens:", result.data);
                 res.cookie("refreshToken", result.data.refreshToken, {
                     httpOnly: true,
-                    //secure: process.env.NODE_ENV === 'production',
                     secure: true,
                     sameSite: "lax",
                     maxAge: 20 * 1000 // 20 secund в ms
                 });
                 res.status(httpStatuses_type_1.httpStatus.Ok).send({ accessToken: result.data.accessToken });
+                console.log("При логинизации создался SET-COOKIE:", res.getHeaders()['set-cookie']);
                 break;
             default:
                 res.sendStatus(httpStatuses_type_1.httpStatus.InternalServerError);
@@ -42,3 +46,6 @@ function authHandler(req, res) {
         }
     });
 }
+//400 - ошибка валидации
+//401 - неправильные данные для входа (не совпало с БД)
+//429 - больше 5 попыток авторизации за 10 секунд с одного ip-адреса

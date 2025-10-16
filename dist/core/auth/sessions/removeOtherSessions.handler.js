@@ -9,27 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logoutHandler = logoutHandler;
+exports.removeOtherSessionsHandler = removeOtherSessionsHandler;
 const httpStatuses_type_1 = require("../../types/httpStatuses.type");
-const authService_bll_1 = require("../BLL/authService.bll");
+const sessionsService_bll_1 = require("../BLL/sessionsService.bll");
 const ResultObject_type_1 = require("../../types/ResultObject.type");
-function logoutHandler(req, res) {
+function removeOtherSessionsHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        // check actual token
+        //
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
-        // вносим изменения в БД, т.е. протухаем существующий токен
-        const result = yield authService_bll_1.authService.removeRefreshToken(refreshToken);
-        //проверяем статус того че пришло из БД
+        const result = yield sessionsService_bll_1.sessionsService.removeOtherSessions(refreshToken);
         if (result.status !== ResultObject_type_1.ResultStatuses.success) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;
         }
-        //очищаем куки и возвращаем ответочку
-        res.clearCookie("refreshToken");
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
     });
 }

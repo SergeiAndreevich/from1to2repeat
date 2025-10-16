@@ -18,6 +18,7 @@ const mapBlogToView_mapper_1 = require("../mappers/mapBlogToView.mapper");
 const bcrypt_helper_1 = require("../helpers/bcrypt.helper");
 const mapPostToView_mapper_1 = require("../mappers/mapPostToView.mapper");
 const mapCommentToView_mapper_1 = require("../mappers/mapCommentToView.mapper");
+const mapSessionsToView_mapper_1 = require("../mappers/mapSessionsToView.mapper");
 //не забудь потом вернуться к пагинации и поправить типы. Как в валидации, так и в приходящей dto
 exports.queryRepo = {
     findUserByIdOrFail(userId) {
@@ -216,6 +217,15 @@ exports.queryRepo = {
                 return null;
             }
             return (0, mapUserToView_mapper_1.mapUserToView)(user).email;
+        });
+    },
+    findSessionByDevice(deviceId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const session = yield mongoDB_db_1.authCollection.findOne({ deviceId: deviceId, revoked: false });
+            if (!session) {
+                return null;
+            }
+            return (0, mapSessionsToView_mapper_1.mapSessionToView)(session);
         });
     }
 };

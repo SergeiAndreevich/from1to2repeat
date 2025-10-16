@@ -14,68 +14,83 @@ const mongoDB_db_1 = require("../../db/mongoDB.db");
 const ResultObject_type_1 = require("../../types/ResultObject.type");
 const jwt_helper_1 = require("../../helpers/jwt.helper");
 exports.authRepo = {
-    addRefreshToken(data) {
+    // async addRefreshToken(data: TypeAccessDataModel){
+    //     await authCollection.insertOne(data)
+    //     return
+    // },
+    addSession(data) {
         return __awaiter(this, void 0, void 0, function* () {
             yield mongoDB_db_1.authCollection.insertOne(data);
+            console.log('CREATED SESSION IN LOGIN', data);
             return;
         });
     },
-    updateTokens(refreshToken) {
+    updateSession(session) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield mongoDB_db_1.authCollection.updateOne({ userId: session.userId }, {
+                $set: {
+                    deviceId: session.deviceId,
+                    lastActivity: session.lastActivity,
+                    expiresAt: session.expiresAt
+                }
+            });
+            return;
+        });
+    },
+    updateTokens(payload) {
         return __awaiter(this, void 0, void 0, function* () {
             //1️⃣ ищем и проверяем на актуальность введенный рефреш-токен
-            const oldRefreshToken = yield mongoDB_db_1.authCollection.findOne({ jti: refreshToken.jti });
-            if (!oldRefreshToken) {
+            const oldSession = yield mongoDB_db_1.authCollection.findOne({ deviceId: payload.deviceId });
+            if (!oldSession) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
             // 2️⃣ если токен уже отозван — сразу 401
-            if (oldRefreshToken.revoked) {
+            if (oldSession.revoked) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
             // 3️⃣ проверяем, не истёк ли токен (сравниваем корректно)
             const now = new Date();
-            if (oldRefreshToken.expiresAt.getTime() < now.getTime()) {
+            if (oldSession.expiresAt.getTime() < now.getTime()) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
-            // 🧠 Что происходит
-            // Ты сравниваешь:
-            // oldRefreshToken.expiresAt — дата в формате Date, хранящаяся в БД;
+            // oldRefreshToken.expiresAt — дата в формате Date, хранящаяся в БД, в милисекундах;
             // refreshToken.expiresAt — число в секундах UNIX, пришедшее из JWT.
-            // Эти значения никогда не совпадут по масштабу (у одного миллисекунды, у другого секунды),
-            // поэтому почти всегда условие oldRefreshToken!.expiresAt < refreshToken.expiresAt → true,
-            // и ты возвращаешь unauthorized.
             // 4️⃣ протухаем старый рефреш-токен
-            yield mongoDB_db_1.authCollection.updateOne({ jti: refreshToken.jti }, { $set: { revoked: true } });
+            yield mongoDB_db_1.authCollection.updateOne({ deviceId: payload.deviceId }, { $set: { revoked: true } });
             //создаем новую пару аксес-рефреш
-            const newAccessToken = yield jwt_helper_1.jwtHelper.generateAccessToken(oldRefreshToken.userId);
-            const newRefreshToken = yield jwt_helper_1.jwtHelper.generateRefreshToken(oldRefreshToken.userId);
+            const newAccessToken = jwt_helper_1.jwtHelper.generateAccessToken(oldSession.userId);
+            const newRefreshToken = jwt_helper_1.jwtHelper.generateRefreshToken(oldSession.userId);
             //сохраняем в БД
-            const decodedRefresh = yield jwt_helper_1.jwtHelper.verifyRefreshToken(newRefreshToken.refreshToken);
-            const tokenToDb = {
-                jti: newRefreshToken.jti,
-                userId: oldRefreshToken.userId,
+            const decodedRefresh = jwt_helper_1.jwtHelper.verifyRefreshToken(newRefreshToken.refreshToken);
+            const update = {
+                userId: oldSession.userId,
+                deviceId: newRefreshToken.deviceId,
+                ip: oldSession.ip,
+                deviceName: oldSession.deviceName,
                 expiresAt: new Date(decodedRefresh.exp * 1000),
+                lastActivity: new Date(decodedRefresh.iat * 1000),
                 revoked: false
             };
-            yield exports.authRepo.addRefreshToken(tokenToDb);
-            return { data: { accessToken: newAccessToken, refreshToken: newRefreshToken.refreshToken }, status: ResultObject_type_1.ResultStatuses.success };
+            yield exports.authRepo.addSession(update);
+            return { data: { accessToken: newAccessToken, refreshToken: newRefreshToken.deviceId }, status: ResultObject_type_1.ResultStatuses.success };
         });
     },
     removeRefreshToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             //ищем и проверяем на актуальность введенный рефреш-токен
-            const oldRefreshToken = yield mongoDB_db_1.authCollection.findOne({ jti: token.jti });
-            if (!oldRefreshToken) {
+            const oldSession = yield mongoDB_db_1.authCollection.findOne({ deviceId: token.jti });
+            if (!oldSession) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
             // 🔥 если токен уже отозван
-            if (oldRefreshToken.revoked) {
+            if (oldSession.revoked) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
-            if (oldRefreshToken.expiresAt.getTime() < new Date().getTime()) {
+            if (oldSession.expiresAt.getTime() < new Date().getTime()) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
             //протухаем старый рефреш-токен
-            yield mongoDB_db_1.authCollection.updateOne({ jti: token.jti }, { $set: {
+            yield mongoDB_db_1.authCollection.updateOne({ deviceId: token.jti }, { $set: {
                     revoked: true
                 } });
             return { data: null, status: ResultObject_type_1.ResultStatuses.success };

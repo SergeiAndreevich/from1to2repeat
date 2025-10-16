@@ -21,25 +21,25 @@ function registrationHandler(req, res) {
         //204 - если входящие данные приняты. Код подтверждения вскоре будет выслан на указанную почту
         // код в ссылке как квери-параметр, например, ляляля?code=yourcode
         //ну и 400, еслу юзер уже есть (а также если некорректный инпут)
-        console.log('=== REGISTRATION DEBUG ===');
-        console.log('1. NODE_ENV:', process.env.NODE_ENV);
+        //console.log('=== REGISTRATION DEBUG ===');
+        //console.log('1. NODE_ENV:', process.env.NODE_ENV);
         const userInput = req.body;
-        console.log('2. User input:', userInput);
+        //console.log('2. User input:', userInput);
         //передаем их в БЛЛ и просим создать юзера, результатом создания является id
         const newUserResult = yield usersService_bll_1.usersService.createUser(userInput);
-        console.log('3. Service result status:', newUserResult);
+        //console.log('3. Service result status:', newUserResult);
         //результат работы по созданию юзера
         if (newUserResult.status === ResultObject_type_1.ResultStatuses.alreadyExist) {
             res.status(httpStatuses_type_1.httpStatus.BadRequest).send((0, createErrorsMessage_function_1.createErrorsMessages)(newUserResult.errorMessage));
             return;
         }
         const user = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(newUserResult.data.id);
-        console.log('4. User found:', user);
+        //console.log('4. User found:', user);
         if (!user) {
             res.sendStatus(httpStatuses_type_1.httpStatus.ExtraError);
             return;
         }
-        console.log('5. 🔒 Sending response WITHOUT code for production');
+        //console.log('5. 🔒 Sending response WITHOUT code for production');
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
         //res.sendStatus(204)
         // ⭐ В ТЕСТОВОЙ СРЕДЕ ВОЗВРАЩАЕМ КОД ⭐

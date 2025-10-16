@@ -22,18 +22,26 @@ const testingRouter_router_1 = require("./routers/testingRouter.router");
 const usersRouter_router_1 = require("./routers/usersRouter.router");
 const commentsRouter_router_1 = require("./routers/commentsRouter.router");
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const securityDevices_router_1 = require("./routers/securityDevices.router");
 const setupApp = (app) => {
-    app.use(express_1.default.json());
     app.use((0, cookie_parser_1.default)());
+    app.use(express_1.default.json());
     app.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).send(`Go to ${path_1.PATH.docs}`);
     }));
+    // app.use((req, res, next) => {
+    //     console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+    //     console.log('Cookies:', req.cookies);
+    //     console.log('Headers:', req.headers);
+    //     next();
+    // });
     app.use(path_1.PATH.auth, authRouter_router_1.authRouter);
     app.use(path_1.PATH.blogs, blogsRouter_router_1.blogsRouter);
     app.use(path_1.PATH.posts, postsRouter_router_1.postsRouter);
     app.use(path_1.PATH.testing, testingRouter_router_1.testingRouter);
     app.use(path_1.PATH.users, usersRouter_router_1.usersRouter);
     app.use(path_1.PATH.comments, commentsRouter_router_1.commentsRouter);
+    app.use(path_1.PATH.security, securityDevices_router_1.securityRouter);
     return app;
 };
 exports.setupApp = setupApp;

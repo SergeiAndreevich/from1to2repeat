@@ -15,42 +15,42 @@ const ResultObject_type_1 = require("../../types/ResultObject.type");
 const jwt_helper_1 = require("../../helpers/jwt.helper");
 const authRepository_repository_1 = require("../../dataAcsessLayer/repository/authRepository.repository");
 exports.authService = {
-    checkUserInfo(info) {
+    checkUserInfo(info, dataToDb) {
         return __awaiter(this, void 0, void 0, function* () {
             //проверяем, есть ли такой юзер и совпадают ли данные аутентификации
             const { loginOrEmail, password } = info;
-            const doesUserExist = yield queryRepo_repository_1.queryRepo.findUserByAuthOrFail(loginOrEmail, password);
-            //console.log("DEBUG doesUserExist:", doesUserExist);
+            const user = yield queryRepo_repository_1.queryRepo.findUserByAuthOrFail(loginOrEmail, password);
             //если не удалась аутентификация, то прерываем процесс авторизации
-            if (doesUserExist.status !== ResultObject_type_1.ResultStatuses.success) {
+            if (user.status !== ResultObject_type_1.ResultStatuses.success) {
                 return {
                     data: null,
-                    status: doesUserExist.status
+                    status: user.status
                 };
             }
             // создаем пару AccessToken и RefreshToken
-            const userId = doesUserExist.data.id;
+            const userId = user.data.id; //userID это MomgoID, которое присвоилось юзеру при регистрации
             const accessToken = jwt_helper_1.jwtHelper.generateAccessToken(userId);
-            const { refreshToken, jti } = jwt_helper_1.jwtHelper.generateRefreshToken(userId);
-            //console.log("DEBUG accessToken:", accessToken);
-            //console.log("DEBUG refreshToken:", refreshToken);
-            //сохраняем в БД
+            const { refreshToken, deviceId } = jwt_helper_1.jwtHelper.generateRefreshToken(userId);
+            //раскукоживаем payload (в payload сидит userId, jti, iat, exp = iat + expiresIn)
             const decodedRefresh = jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
-            //console.log("DEBUG decodedRefresh:", decodedRefresh);
-            // if (!payload || typeof payload !== 'object' || !('userId' in payload)) {
-            //     res.sendStatus(httpStatus.Unauthorized);
-            //     return
-            // }
-            const tokenToDb = {
-                jti,
-                userId,
+            if (!decodedRefresh) {
+                return { data: null, status: ResultObject_type_1.ResultStatuses.error };
+            }
+            //создаем экземпляр сессии
+            const session = {
+                userId: userId,
+                deviceId: deviceId,
+                ip: dataToDb.ip,
+                deviceName: dataToDb.deviceName,
+                lastActivity: new Date(decodedRefresh.iat * 1000),
                 expiresAt: new Date(decodedRefresh.exp * 1000),
                 revoked: false
             };
-            yield authRepository_repository_1.authRepo.addRefreshToken(tokenToDb);
+            //сохраняем в БД
+            yield authRepository_repository_1.authRepo.addSession(session);
             return {
                 data: { accessToken, refreshToken },
-                status: doesUserExist.status
+                status: user.status
             };
         });
     },
@@ -59,13 +59,8 @@ exports.authService = {
             //раскукоживаем рефреш-токен и получаем оттуда данные
             const decodedRefresh = jwt_helper_1.jwtHelper.verifyRefreshToken(refreshToken);
             if (!decodedRefresh) {
-                return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized, errorMessage: { field: 'refreshToken', message: 'Refresh token is empty' } };
+                return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
-            //идем в БД и проверяем, актуальный ли у нас рефреш-токен
-            //изменяем в БД данные по старому рефреш-токену
-            //создаем новую пару аксес-рефреш токенов
-            //выдаем их как результат
-            //а уже в хендлере аксес-токен отдаем в боди, а в куки зашиваем новый рефреш
             const result = yield authRepository_repository_1.authRepo.updateTokens(decodedRefresh);
             return { data: result.data, status: result.status, errorMessage: result.errorMessage };
         });

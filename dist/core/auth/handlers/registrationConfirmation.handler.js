@@ -17,26 +17,26 @@ const createErrorsMessage_function_1 = require("../../errors/createErrorsMessage
 function registrationConfirmationHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { code } = req.body; // ✅ достаём строку
-        console.log('🔍 Confirmation attempt with code:', code, typeof code);
+        //console.log('🔍 Confirmation attempt with code:', code, typeof code);
         //204 если код подходит
         const result = yield usersService_bll_1.usersService.confirmUser(code);
-        console.log('🔍 Confirmation result:', result.status);
+        //console.log('🔍 Confirmation result:', result.status);
         if (result.status === ResultObject_type_1.ResultStatuses.unauthorized) {
-            console.log('❌ Code expired');
+            //console.log('❌ Code expired');
             res.status(httpStatuses_type_1.httpStatus.BadRequest).send((0, createErrorsMessage_function_1.createErrorsMessages)(result.errorMessage));
             return;
         }
         if (result.status === ResultObject_type_1.ResultStatuses.notFound) {
-            console.log('❌ Code not found');
+            //console.log('❌ Code not found');
             res.status(httpStatuses_type_1.httpStatus.BadRequest).send((0, createErrorsMessage_function_1.createErrorsMessages)(result.errorMessage));
             return;
         }
         if (result.status === ResultObject_type_1.ResultStatuses.alreadyExist) {
-            console.log('❌ Already confirmed');
+            //console.log('❌ Already confirmed');
             res.status(httpStatuses_type_1.httpStatus.BadRequest).send((0, createErrorsMessage_function_1.createErrorsMessages)(result.errorMessage));
             return;
         }
-        console.log('✅ Email confirmed successfully');
+        //console.log('✅ Email confirmed successfully');
         res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
         //400 если код не подходит, истек или уже был применен
     });

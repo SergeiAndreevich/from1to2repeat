@@ -6,9 +6,8 @@ import {v4 as uuidv4} from "uuid";
 const SECRET_KEY = process.env.SECRET_KEY || 'hello';
 
 export const jwtHelper = {
-    async createToken(user: TypeUserViewModel):Promise<string> {
-        const data = {userId: user.id}
-        return sign(data, SECRET_KEY,{expiresIn: '1h'} );
+    generateAccessToken(userId:string){
+        return sign({userId}, SECRET_KEY, {expiresIn: '10s'} );
     },
     verifyToken(userToken: string):string | JwtPayload | null {
         try{
@@ -19,13 +18,11 @@ export const jwtHelper = {
             return  null
         }
     },
-    generateAccessToken(userId:string){
-        return sign({userId}, SECRET_KEY, {expiresIn: '10s'} );
-    },
+
     generateRefreshToken(userId: string) {
-        const jti = uuidv4();
-        const refreshToken = sign({userId, jti}, SECRET_KEY, {expiresIn: '20s'} );
-        return {refreshToken, jti}
+        const deviceId = uuidv4();
+        const refreshToken = sign({userId:userId, deviceId: deviceId}, SECRET_KEY, {expiresIn: '20s'} );
+        return {refreshToken, deviceId}
     },
     verifyRefreshToken(refreshToken: string):JwtPayload | null {
         try{

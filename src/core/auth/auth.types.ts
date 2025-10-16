@@ -30,3 +30,11 @@ export type TypeSessionUpdateModel = {
     lastActivity: Date;
     expiresAt: Date;
 }
+
+export type TypeSessionToViewModel = {
+    ip: string;
+    title: string;
+    lastActiveDate: string;
+    deviceId: string;
+
+}

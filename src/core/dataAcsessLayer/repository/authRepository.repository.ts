@@ -17,7 +17,8 @@ export const authRepo = {
     //     return
     // },
     async addSession(data: TypeSessionModel){
-        await authCollection.insertOne(data)
+        await authCollection.insertOne(data);
+        console.log('CREATED SESSION IN LOGIN',  data);
         return
     },
     async updateSession(session: TypeSessionUpdateModel){
@@ -30,60 +31,58 @@ export const authRepo = {
         })
         return
     },
-    async updateTokens(refreshToken: JwtPayload):Promise<IResult<null | {accessToken: string, refreshToken: string}>>{
+    async updateTokens(payload: JwtPayload):Promise<IResult<null | {accessToken: string, refreshToken: string}>>{
         //1️⃣ ищем и проверяем на актуальность введенный рефреш-токен
-        const oldRefreshToken = await authCollection.findOne({jti: refreshToken.jti});
-        if(!oldRefreshToken) {
+        const oldSession = await authCollection.findOne({deviceId: payload.deviceId});
+        if(!oldSession) {
             return {data: null, status: ResultStatuses.unauthorized}
         }
         // 2️⃣ если токен уже отозван — сразу 401
-        if (oldRefreshToken.revoked) {
+        if (oldSession.revoked) {
             return { data: null, status: ResultStatuses.unauthorized };
         }
         // 3️⃣ проверяем, не истёк ли токен (сравниваем корректно)
         const now = new Date();
-        if (oldRefreshToken.expiresAt.getTime() < now.getTime()) {
+        if (oldSession.expiresAt.getTime() < now.getTime()) {
             return { data: null, status: ResultStatuses.unauthorized };
         }
-        // 🧠 Что происходит
-        // Ты сравниваешь:
-        // oldRefreshToken.expiresAt — дата в формате Date, хранящаяся в БД;
+        // oldRefreshToken.expiresAt — дата в формате Date, хранящаяся в БД, в милисекундах;
         // refreshToken.expiresAt — число в секундах UNIX, пришедшее из JWT.
-        // Эти значения никогда не совпадут по масштабу (у одного миллисекунды, у другого секунды),
-        // поэтому почти всегда условие oldRefreshToken!.expiresAt < refreshToken.expiresAt → true,
-        // и ты возвращаешь unauthorized.
 
         // 4️⃣ протухаем старый рефреш-токен
         await authCollection.updateOne(
-            {jti: refreshToken.jti},
+            {deviceId: payload.deviceId},
             {$set: { revoked: true}}
         );
         //создаем новую пару аксес-рефреш
-        const newAccessToken = jwtHelper.generateAccessToken(oldRefreshToken.userId);
-        const newRefreshToken = jwtHelper.generateRefreshToken(oldRefreshToken.userId);
+        const newAccessToken = jwtHelper.generateAccessToken(oldSession.userId);
+        const newRefreshToken = jwtHelper.generateRefreshToken(oldSession.userId);
 
         //сохраняем в БД
         const decodedRefresh =  jwtHelper.verifyRefreshToken(newRefreshToken.refreshToken);
-        const update:TypeSessionUpdateModel = {
-            deviceId: newRefreshToken.jti,
-            userId: oldRefreshToken.userId,
+        const update:TypeSessionModel = {
+            userId: oldSession.userId,
+            deviceId: newRefreshToken.deviceId,
+            ip: oldSession.ip,
+            deviceName: oldSession.deviceName,
             expiresAt: new Date(decodedRefresh!.exp!* 1000),
-            lastActivity: new Date(decodedRefresh!.iat!* 1000)
+            lastActivity: new Date(decodedRefresh!.iat!* 1000),
+            revoked: false
         }
-        await authRepo.updateSession(update);
-        return  {data: {accessToken: newAccessToken, refreshToken: newRefreshToken.refreshToken}, status: ResultStatuses.success}
+        await authRepo.addSession(update);
+        return  {data: {accessToken: newAccessToken, refreshToken: newRefreshToken.deviceId}, status: ResultStatuses.success}
     },
     async removeRefreshToken(token: JwtPayload):Promise<IResult<null>>{
         //ищем и проверяем на актуальность введенный рефреш-токен
-        const oldRefreshToken = await authCollection.findOne({deviceId: token.jti});
-        if(!oldRefreshToken) {
+        const oldSession = await authCollection.findOne({deviceId: token.jti});
+        if(!oldSession) {
             return {data: null, status: ResultStatuses.unauthorized}
         }
         // 🔥 если токен уже отозван
-        if (oldRefreshToken.revoked) {
+        if (oldSession.revoked) {
             return { data: null, status: ResultStatuses.unauthorized };
         }
-        if(oldRefreshToken!.expiresAt.getTime() < new Date().getTime()) {
+        if(oldSession!.expiresAt.getTime() < new Date().getTime()) {
             return {data: null, status: ResultStatuses.unauthorized}
         }
         //протухаем старый рефреш-токен

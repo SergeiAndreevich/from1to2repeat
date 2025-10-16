@@ -18,6 +18,7 @@ const mongoDB_db_1 = require("./core/db/mongoDB.db");
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = (0, express_1.default)();
+        app.set('trust proxy', true); //это для прокти в отображении ip для сессий
         (0, setup_app_1.setupApp)(app);
         const PORT = process.env.PORT || 5005;
         //подключаем к проекту БД (тк мы обращаемся на сервер и требуется подождать ответ, то оборачиваем в async/await)

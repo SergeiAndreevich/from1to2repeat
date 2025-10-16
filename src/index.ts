@@ -4,7 +4,9 @@ import {dbSettings, runDB} from "./core/db/mongoDB.db";
 
 async function main() {
     const app = express();
+    app.set('trust proxy', true);  //это для прокти в отображении ip для сессий
     setupApp(app);
+
 
     const PORT = process.env.PORT || 5005;
 

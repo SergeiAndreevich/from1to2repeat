@@ -12,7 +12,6 @@ export async function authHandler(req:Request, res:Response){
     const deviceName = req.headers['user-agent']  || 'Unknown device';
     //проверяем, есть ли такой юзер. Если есть и все данные сходятся - выдаем токены
     const result = await authService.checkUserInfo(req.body, {ip, deviceName});
-    //console.log("DEBUG result in authHandler:", result);
     switch (result.status) {
         case ResultStatuses.notFound:
             res.sendStatus(httpStatus.NotFound);
@@ -21,15 +20,14 @@ export async function authHandler(req:Request, res:Response){
             res.sendStatus(httpStatus.Unauthorized);
             break
         case ResultStatuses.success:
-            //console.log("DEBUG sending tokens:", result.data);
             res.cookie("refreshToken", result.data!.refreshToken, {
                 httpOnly: true,
-                //secure: process.env.NODE_ENV === 'production',
                 secure: true,
                 sameSite: "lax",
                 maxAge: 20 * 1000 // 20 secund в ms
             });
-            res.status(httpStatus.Ok).send({accessToken: result.data!.accessToken})
+            res.status(httpStatus.Ok).send({accessToken: result.data!.accessToken});
+            console.log("При логинизации создался SET-COOKIE:", res.getHeaders()['set-cookie']);
             break
         default:
             res.sendStatus(httpStatus.InternalServerError)
@@ -37,3 +35,8 @@ export async function authHandler(req:Request, res:Response){
     }
 
 }
+//400 - ошибка валидации
+//401 - неправильные данные для входа (не совпало с БД)
+//429 - больше 5 попыток авторизации за 10 секунд с одного ip-адреса
+
+

@@ -1,5 +1,5 @@
 import {IPAginationAndSorting, PostsSortFields} from "../pagination/pagination-and-sorting.types";
-import {blogsCollection, commentsCollection, postsCollection, usersCollection} from "../db/mongoDB.db";
+import {authCollection, blogsCollection, commentsCollection, postsCollection, usersCollection} from "../db/mongoDB.db";
 import {ObjectId, WithId} from "mongodb";
 import {TypeUser, TypeUserExtended, TypeUserViewModel} from "../../Entity/Users/User.types";
 import {mapUserToView} from "../mappers/mapUserToView.mapper";
@@ -14,6 +14,7 @@ import {mapPostToView} from "../mappers/mapPostToView.mapper";
 import {TypeComment, TypeCommentViewModel} from "../../Entity/Comments/Comment.types";
 import {mapCommentToView} from "../mappers/mapCommentToView.mapper";
 import {TypePost, TypePostViewModel} from "../../Entity/Posts/Post.types";
+import {mapSessionToView} from "../mappers/mapSessionsToView.mapper";
 
 //не забудь потом вернуться к пагинации и поправить типы. Как в валидации, так и в приходящей dto
 
@@ -224,5 +225,12 @@ export const queryRepo = {
             return null
         }
         return mapUserToView(user).email
+    },
+    async findSessionByDevice(deviceId:string){
+        const session = await authCollection.findOne({deviceId: deviceId, revoked: false});
+        if(!session) {
+            return null
+        }
+        return mapSessionToView(session)
     }
 }

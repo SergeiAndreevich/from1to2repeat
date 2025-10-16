@@ -24,15 +24,12 @@ exports.authRouter
     .post('/registration-email-resending', emailValidation_validation_1.emailValidation, validationErrorResult_handler_1.checkValidationErrors, resendConfirmation_handler_1.resendConfirmationHandler) //переотправили письмо с кодом
     .post('/refresh-token', refreshToken_handler_1.refreshHandler) //выдаем новый рефреш-токен по старому
     .post('/logout', logout_handler_1.logoutHandler); //протухаем рефреш токен и больше не выдаем новых
-// Нужно разрешить доступ к маршруту /auth/refresh-token без JWT-проверки.
-// Туда человек приходит как раз тогда, когда у него access-токен просрочен, чтобы обновить его через refresh-токен.
-// У меня сначала стоял там токен-гуард, вероятно из-за этого шли прахом все тесты
-// .post('/login', inputAuthValidation, checkValidationErrors, async(req:Request,res:Response)=>{
-//     const user = await authService.checkUserInfo(req.body);
-//     console.log(user);
-//     if(user.status ===  ResultStatuses.success){
-//         res.sendStatus(httpStatus.NoContent);
-//         return
-//     }
-//     res.sendStatus(httpStatus.Unauthorized)
-// })
+// В базе данных, кроме даты выдачи токена,
+//     храним так же дату окончания действия токена, для того, чтобы можно было периодически зачищать девайсы (сессии) с "протухшиими" токенами;
+// Auth: ограничения на кол-во попыток (обратите внимание на response-код 429). Для каждого защищенного эндпоинта попытки подсчитывем отдельно
+//короче, теперь в /login мы создаем сессию с уникальным userId[MongoID] и deviceId [uuid(), бывший jti]
+//и в refreshToken сидит deviceId
+//при /refresh-token мы берем refreshToken из куки, раскукоживаем (userId, deviceId),
+//протухаем сессию по deviceId и создаем новые accessToken, refreshToken
+//создаем новую сессию, но в неё нужно перезаписать старые userId, ip, deviceName
+//при /logout смотрим на refreshToken, если все ок - протухаем его и очищаем куки

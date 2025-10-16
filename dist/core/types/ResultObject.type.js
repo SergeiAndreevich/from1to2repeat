@@ -8,4 +8,5 @@ var ResultStatuses;
     ResultStatuses["notFound"] = "notFound";
     ResultStatuses["unauthorized"] = "unauthorized";
     ResultStatuses["alreadyExist"] = "alreadyExist";
+    ResultStatuses["forbidden"] = "forbidden";
 })(ResultStatuses || (exports.ResultStatuses = ResultStatuses = {}));

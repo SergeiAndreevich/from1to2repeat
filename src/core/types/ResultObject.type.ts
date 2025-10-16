@@ -9,5 +9,6 @@ export enum ResultStatuses {
     success='success',
     notFound='notFound',
     unauthorized='unauthorized',
-    alreadyExist = 'alreadyExist'
+    alreadyExist = 'alreadyExist',
+    forbidden='forbidden'
 }
