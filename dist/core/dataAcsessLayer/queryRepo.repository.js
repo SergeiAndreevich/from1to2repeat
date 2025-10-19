@@ -227,5 +227,15 @@ exports.queryRepo = {
             }
             return (0, mapSessionsToView_mapper_1.mapSessionToView)(session);
         });
+    },
+    findSession(deviceId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const session = yield mongoDB_db_1.authCollection.findOne({ deviceId: deviceId, revoked: false });
+            if (!session) {
+                return null;
+            }
+            const viewModel = (0, mapSessionsToView_mapper_1.mapSessionToView)(session);
+            return Object.assign(Object.assign({}, viewModel), { userId: session.userId });
+        });
     }
 };

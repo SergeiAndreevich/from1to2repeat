@@ -8,7 +8,7 @@ import {TypePaginatorObject} from "../types/paginatorObject.type";
 import {TypeBlog, TypeBlogViewModel} from "../../Entity/Blogs/Blog.types";
 import {mapBlogToView} from "../mappers/mapBlogToView.mapper";
 import {bcryptHelper} from "../helpers/bcrypt.helper";
-import {TypeMeViewModel} from "../auth/auth.types";
+import {TypeMeViewModel, TypeSessionToViewModel} from "../auth/auth.types";
 import {mapMeToView} from "../mappers/mapMeToView.mapper";
 import {mapPostToView} from "../mappers/mapPostToView.mapper";
 import {TypeComment, TypeCommentViewModel} from "../../Entity/Comments/Comment.types";
@@ -226,11 +226,21 @@ export const queryRepo = {
         }
         return mapUserToView(user).email
     },
-    async findSessionByDevice(deviceId:string){
+    async findSessionByDevice(deviceId:string):Promise<TypeSessionToViewModel | null>{
         const session = await authCollection.findOne({deviceId: deviceId, revoked: false});
         if(!session) {
             return null
         }
-        return mapSessionToView(session)
+        return mapSessionToView(session);
+
+    },
+    async findSession(deviceId:string):Promise<TypeSessionToViewModel&{userId:string} | null>{
+        const session = await authCollection.findOne({deviceId: deviceId, revoked: false});
+        if(!session) {
+            return null
+        }
+        const viewModel=  mapSessionToView(session);
+        return {...viewModel,userId:session.userId}
+
     }
 }

@@ -10,5 +10,6 @@ export enum ResultStatuses {
     notFound='notFound',
     unauthorized='unauthorized',
     alreadyExist = 'alreadyExist',
-    forbidden='forbidden'
+    forbidden='forbidden',
+    manyRequests='manyRequests'
 }

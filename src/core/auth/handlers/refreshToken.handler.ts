@@ -8,7 +8,6 @@ import {factory} from "ts-jest/dist/transformers/hoist-jest";
 
 
 export async function refreshHandler(req: Request, res: Response){
-    //console.log('______START REFRESH_TOKEN HANDLER______')
     //проверяем,пришел ли в куки рефреш-токен
     const refreshToken = req.cookies.refreshToken;
     if(!refreshToken){
@@ -30,6 +29,7 @@ export async function refreshHandler(req: Request, res: Response){
         sameSite: "lax",
         maxAge: 20 * 1000 // 20 secund в ms
     });
+    console.log('refreshToken', refreshToken);
     res.status(httpStatus.Ok).send({accessToken: result.data!.accessToken})
 }
 //идем в БД и проверяем, актуальный ли у нас рефреш-токен

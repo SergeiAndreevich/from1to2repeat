@@ -9,4 +9,5 @@ var ResultStatuses;
     ResultStatuses["unauthorized"] = "unauthorized";
     ResultStatuses["alreadyExist"] = "alreadyExist";
     ResultStatuses["forbidden"] = "forbidden";
+    ResultStatuses["manyRequests"] = "manyRequests";
 })(ResultStatuses || (exports.ResultStatuses = ResultStatuses = {}));

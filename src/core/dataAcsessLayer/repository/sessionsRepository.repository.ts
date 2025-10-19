@@ -19,12 +19,12 @@ export const sessionsRepo = {
         );
         return {data:null, status:ResultStatuses.success}
     },
-    async compareSessions(payload:JwtPayload, session: TypeSessionToViewModel) {
+    async compareSessions(payload:JwtPayload, session: TypeSessionToViewModel&{userId:string}) {
         const sessionFromRT = await authCollection.findOne<TypeSessionModel>({deviceId: payload.deviceId, revoked:false});
         if(!sessionFromRT) {
             return ResultStatuses.notFound
         }
-        if(sessionFromRT.deviceId !== session.deviceId) {
+        if(sessionFromRT.userId !== session.userId) {
             return ResultStatuses.forbidden
         }
         return ResultStatuses.success

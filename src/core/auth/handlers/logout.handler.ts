@@ -6,6 +6,7 @@ import {ResultStatuses} from "../../types/ResultObject.type";
 export async function logoutHandler(req: Request, res: Response): Promise<void> {
     // check actual token
     const refreshToken = req.cookies.refreshToken;
+    console.log(`Refreshing token in LOGOUT ${refreshToken}`);
     if(!refreshToken) {
         res.sendStatus(httpStatus.Unauthorized);
         return

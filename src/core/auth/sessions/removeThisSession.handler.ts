@@ -6,7 +6,7 @@ import {queryRepo} from "../../dataAcsessLayer/queryRepo.repository";
 
 export async function removeThisSessionHandler(req:Request, res: Response) {
     const deviceId = req.params.deviceId;
-    const session = await queryRepo.findSessionByDevice(deviceId);
+    const session = await queryRepo.findSession(deviceId);
     if(!session) {
         res.sendStatus(httpStatus.NotFound);
         return

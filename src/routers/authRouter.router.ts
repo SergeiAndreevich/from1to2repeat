@@ -16,17 +16,18 @@ import {registrationConfirmationHandler} from "../core/auth/handlers/registratio
 import {resendConfirmationHandler} from "../core/auth/handlers/resendConfirmation.handler";
 import {refreshHandler} from "../core/auth/handlers/refreshToken.handler";
 import {logoutHandler} from "../core/auth/handlers/logout.handler";
+import {antiClicker} from "../core/protection/antiClicker.middleware";
 
 export const authRouter = Router({});
 
 authRouter
-    .get('/me', tokenGuard, whoAmIHandler) //получаем инфо о себе
-    .post('/login',inputAuthValidation, checkValidationErrors, authHandler) //залогинились и получили jwt-token и refreshToken
-    .post('/registration-confirmation', registrationConfirmationValidation, checkValidationErrors, registrationConfirmationHandler) //подтвердили почту
-    .post('/registration', inputRegistrationValidation, checkValidationErrors, registrationHandler) //зарегались и получили письмо с кодом подтверждения
-    .post('/registration-email-resending', emailValidation, checkValidationErrors, resendConfirmationHandler) //переотправили письмо с кодом
-    .post('/refresh-token', refreshHandler) //выдаем новый рефреш-токен по старому
-    .post('/logout', logoutHandler) //протухаем рефреш токен и больше не выдаем новых
+    .get('/me',antiClicker, tokenGuard, whoAmIHandler) //получаем инфо о себе
+    .post('/login', antiClicker,inputAuthValidation, checkValidationErrors, authHandler) //залогинились и получили jwt-token и refreshToken
+    .post('/registration-confirmation', antiClicker, registrationConfirmationValidation, checkValidationErrors, registrationConfirmationHandler) //подтвердили почту
+    .post('/registration', antiClicker, inputRegistrationValidation, checkValidationErrors, registrationHandler) //зарегались и получили письмо с кодом подтверждения
+    .post('/registration-email-resending', antiClicker, emailValidation, checkValidationErrors, resendConfirmationHandler) //переотправили письмо с кодом
+    .post('/refresh-token', antiClicker, refreshHandler) //выдаем новый рефреш-токен по старому
+    .post('/logout', antiClicker, logoutHandler) //протухаем рефреш токен и больше не выдаем новых
 
 // В базе данных, кроме даты выдачи токена,
 //     храним так же дату окончания действия токена, для того, чтобы можно было периодически зачищать девайсы (сессии) с "протухшиими" токенами;

@@ -17,7 +17,7 @@ const queryRepo_repository_1 = require("../../dataAcsessLayer/queryRepo.reposito
 function removeThisSessionHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const deviceId = req.params.deviceId;
-        const session = yield queryRepo_repository_1.queryRepo.findSessionByDevice(deviceId);
+        const session = yield queryRepo_repository_1.queryRepo.findSession(deviceId);
         if (!session) {
             res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
             return;

@@ -24,6 +24,10 @@ export const jwtHelper = {
         const refreshToken = sign({userId:userId, deviceId: deviceId}, SECRET_KEY, {expiresIn: '20s'} );
         return {refreshToken, deviceId}
     },
+    updateRefreshToken(userId: string, deviceId: string) {
+        const refreshToken = sign({userId:userId, deviceId: deviceId}, SECRET_KEY, {expiresIn: '20s'} );
+        return {refreshToken, deviceId}
+    },
     verifyRefreshToken(refreshToken: string):JwtPayload | null {
         try{
             return verify(refreshToken, SECRET_KEY) as JwtPayload;        }

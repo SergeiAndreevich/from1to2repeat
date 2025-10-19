@@ -22,6 +22,10 @@ exports.jwtHelper = {
         const refreshToken = (0, jsonwebtoken_1.sign)({ userId: userId, deviceId: deviceId }, SECRET_KEY, { expiresIn: '20s' });
         return { refreshToken, deviceId };
     },
+    updateRefreshToken(userId, deviceId) {
+        const refreshToken = (0, jsonwebtoken_1.sign)({ userId: userId, deviceId: deviceId }, SECRET_KEY, { expiresIn: '20s' });
+        return { refreshToken, deviceId };
+    },
     verifyRefreshToken(refreshToken) {
         try {
             return (0, jsonwebtoken_1.verify)(refreshToken, SECRET_KEY);

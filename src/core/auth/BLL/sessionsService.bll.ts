@@ -15,7 +15,7 @@ export const sessionsService = {
         const result = await sessionsRepo.removeOtherSessions(payload);
         return {data:result.data, status:result.status}
     },
-    async removeThisSession(session: TypeSessionToViewModel, refreshToken:string):Promise<IResult<null | string>> {
+    async removeThisSession(session: TypeSessionToViewModel&{userId:string}, refreshToken:string):Promise<IResult<null | string>> {
         //проверяем рефреш-токен
         const payload = jwtHelper.verifyRefreshToken(refreshToken);
         if(!payload) {

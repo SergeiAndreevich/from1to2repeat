@@ -15,7 +15,6 @@ const authService_bll_1 = require("../BLL/authService.bll");
 const ResultObject_type_1 = require("../../types/ResultObject.type");
 function refreshHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        //console.log('______START REFRESH_TOKEN HANDLER______')
         //проверяем,пришел ли в куки рефреш-токен
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
@@ -37,6 +36,7 @@ function refreshHandler(req, res) {
             sameSite: "lax",
             maxAge: 20 * 1000 // 20 secund в ms
         });
+        console.log('refreshToken', refreshToken);
         res.status(httpStatuses_type_1.httpStatus.Ok).send({ accessToken: result.data.accessToken });
     });
 }

@@ -10,6 +10,7 @@ var httpStatus;
     httpStatus[httpStatus["Unauthorized"] = 401] = "Unauthorized";
     httpStatus[httpStatus["Forbidden"] = 403] = "Forbidden";
     httpStatus[httpStatus["NotFound"] = 404] = "NotFound";
+    httpStatus[httpStatus["TooManyRequests"] = 429] = "TooManyRequests";
     httpStatus[httpStatus["InternalServerError"] = 500] = "InternalServerError";
     httpStatus[httpStatus["ExtraError"] = 600] = "ExtraError";
 })(httpStatus || (exports.httpStatus = httpStatus = {}));

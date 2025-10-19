@@ -17,6 +17,7 @@ function logoutHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         // check actual token
         const refreshToken = req.cookies.refreshToken;
+        console.log(`Refreshing token in LOGOUT ${refreshToken}`);
         if (!refreshToken) {
             res.sendStatus(httpStatuses_type_1.httpStatus.Unauthorized);
             return;

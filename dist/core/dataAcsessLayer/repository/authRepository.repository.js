@@ -57,9 +57,11 @@ exports.authRepo = {
             // refreshToken.expiresAt — число в секундах UNIX, пришедшее из JWT.
             // 4️⃣ протухаем старый рефреш-токен
             yield mongoDB_db_1.authCollection.updateOne({ deviceId: payload.deviceId }, { $set: { revoked: true } });
+            //сейчас немного финт ушами: не записывать новый deviceId, не генерить новый
+            //а сделать новый Рефреш-токен, но со старым jti
             //создаем новую пару аксес-рефреш
             const newAccessToken = jwt_helper_1.jwtHelper.generateAccessToken(oldSession.userId);
-            const newRefreshToken = jwt_helper_1.jwtHelper.generateRefreshToken(oldSession.userId);
+            const newRefreshToken = jwt_helper_1.jwtHelper.updateRefreshToken(oldSession.userId, payload.deviceId);
             //сохраняем в БД
             const decodedRefresh = jwt_helper_1.jwtHelper.verifyRefreshToken(newRefreshToken.refreshToken);
             const update = {
@@ -72,13 +74,13 @@ exports.authRepo = {
                 revoked: false
             };
             yield exports.authRepo.addSession(update);
-            return { data: { accessToken: newAccessToken, refreshToken: newRefreshToken.deviceId }, status: ResultObject_type_1.ResultStatuses.success };
+            return { data: { accessToken: newAccessToken, refreshToken: newRefreshToken.refreshToken }, status: ResultObject_type_1.ResultStatuses.success };
         });
     },
     removeRefreshToken(token) {
         return __awaiter(this, void 0, void 0, function* () {
             //ищем и проверяем на актуальность введенный рефреш-токен
-            const oldSession = yield mongoDB_db_1.authCollection.findOne({ deviceId: token.jti });
+            const oldSession = yield mongoDB_db_1.authCollection.findOne({ deviceId: token.deviceId });
             if (!oldSession) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
@@ -86,11 +88,11 @@ exports.authRepo = {
             if (oldSession.revoked) {
                 return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
             }
-            if (oldSession.expiresAt.getTime() < new Date().getTime()) {
-                return { data: null, status: ResultObject_type_1.ResultStatuses.unauthorized };
-            }
+            // if(oldSession!.expiresAt.getTime() < new Date().getTime()) {
+            //     return {data: null, status: ResultStatuses.unauthorized}
+            // }
             //протухаем старый рефреш-токен
-            yield mongoDB_db_1.authCollection.updateOne({ deviceId: token.jti }, { $set: {
+            yield mongoDB_db_1.authCollection.updateOne({ deviceId: token.deviceId }, { $set: {
                     revoked: true
                 } });
             return { data: null, status: ResultObject_type_1.ResultStatuses.success };

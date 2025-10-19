@@ -15,15 +15,16 @@ const registrationConfirmation_handler_1 = require("../core/auth/handlers/regist
 const resendConfirmation_handler_1 = require("../core/auth/handlers/resendConfirmation.handler");
 const refreshToken_handler_1 = require("../core/auth/handlers/refreshToken.handler");
 const logout_handler_1 = require("../core/auth/handlers/logout.handler");
+const antiClicker_middleware_1 = require("../core/protection/antiClicker.middleware");
 exports.authRouter = (0, express_1.Router)({});
 exports.authRouter
-    .get('/me', tockenGuard_middleware_1.tokenGuard, whoAmI_handler_1.whoAmIHandler) //получаем инфо о себе
-    .post('/login', inputAuthValidation_validation_1.inputAuthValidation, validationErrorResult_handler_1.checkValidationErrors, auth_handler_1.authHandler) //залогинились и получили jwt-token и refreshToken
-    .post('/registration-confirmation', registrationConfirmationValidation_validation_1.registrationConfirmationValidation, validationErrorResult_handler_1.checkValidationErrors, registrationConfirmation_handler_1.registrationConfirmationHandler) //подтвердили почту
-    .post('/registration', inputRegistrationValidation_validation_1.inputRegistrationValidation, validationErrorResult_handler_1.checkValidationErrors, registration_handler_1.registrationHandler) //зарегались и получили письмо с кодом подтверждения
-    .post('/registration-email-resending', emailValidation_validation_1.emailValidation, validationErrorResult_handler_1.checkValidationErrors, resendConfirmation_handler_1.resendConfirmationHandler) //переотправили письмо с кодом
-    .post('/refresh-token', refreshToken_handler_1.refreshHandler) //выдаем новый рефреш-токен по старому
-    .post('/logout', logout_handler_1.logoutHandler); //протухаем рефреш токен и больше не выдаем новых
+    .get('/me', antiClicker_middleware_1.antiClicker, tockenGuard_middleware_1.tokenGuard, whoAmI_handler_1.whoAmIHandler) //получаем инфо о себе
+    .post('/login', antiClicker_middleware_1.antiClicker, inputAuthValidation_validation_1.inputAuthValidation, validationErrorResult_handler_1.checkValidationErrors, auth_handler_1.authHandler) //залогинились и получили jwt-token и refreshToken
+    .post('/registration-confirmation', antiClicker_middleware_1.antiClicker, registrationConfirmationValidation_validation_1.registrationConfirmationValidation, validationErrorResult_handler_1.checkValidationErrors, registrationConfirmation_handler_1.registrationConfirmationHandler) //подтвердили почту
+    .post('/registration', antiClicker_middleware_1.antiClicker, inputRegistrationValidation_validation_1.inputRegistrationValidation, validationErrorResult_handler_1.checkValidationErrors, registration_handler_1.registrationHandler) //зарегались и получили письмо с кодом подтверждения
+    .post('/registration-email-resending', antiClicker_middleware_1.antiClicker, emailValidation_validation_1.emailValidation, validationErrorResult_handler_1.checkValidationErrors, resendConfirmation_handler_1.resendConfirmationHandler) //переотправили письмо с кодом
+    .post('/refresh-token', antiClicker_middleware_1.antiClicker, refreshToken_handler_1.refreshHandler) //выдаем новый рефреш-токен по старому
+    .post('/logout', antiClicker_middleware_1.antiClicker, logout_handler_1.logoutHandler); //протухаем рефреш токен и больше не выдаем новых
 // В базе данных, кроме даты выдачи токена,
 //     храним так же дату окончания действия токена, для того, чтобы можно было периодически зачищать девайсы (сессии) с "протухшиими" токенами;
 // Auth: ограничения на кол-во попыток (обратите внимание на response-код 429). Для каждого защищенного эндпоинта попытки подсчитывем отдельно

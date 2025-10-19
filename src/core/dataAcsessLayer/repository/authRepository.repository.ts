@@ -54,9 +54,14 @@ export const authRepo = {
             {deviceId: payload.deviceId},
             {$set: { revoked: true}}
         );
+        //сейчас немного финт ушами: не записывать новый deviceId, не генерить новый
+        //а сделать новый Рефреш-токен, но со старым jti
+
+
         //создаем новую пару аксес-рефреш
         const newAccessToken = jwtHelper.generateAccessToken(oldSession.userId);
-        const newRefreshToken = jwtHelper.generateRefreshToken(oldSession.userId);
+        const newRefreshToken = jwtHelper.updateRefreshToken(
+            oldSession.userId, payload.deviceId);
 
         //сохраняем в БД
         const decodedRefresh =  jwtHelper.verifyRefreshToken(newRefreshToken.refreshToken);
@@ -70,11 +75,11 @@ export const authRepo = {
             revoked: false
         }
         await authRepo.addSession(update);
-        return  {data: {accessToken: newAccessToken, refreshToken: newRefreshToken.deviceId}, status: ResultStatuses.success}
+        return  {data: {accessToken: newAccessToken, refreshToken: newRefreshToken.refreshToken}, status: ResultStatuses.success}
     },
     async removeRefreshToken(token: JwtPayload):Promise<IResult<null>>{
         //ищем и проверяем на актуальность введенный рефреш-токен
-        const oldSession = await authCollection.findOne({deviceId: token.jti});
+        const oldSession = await authCollection.findOne({deviceId: token.deviceId});
         if(!oldSession) {
             return {data: null, status: ResultStatuses.unauthorized}
         }
@@ -82,11 +87,11 @@ export const authRepo = {
         if (oldSession.revoked) {
             return { data: null, status: ResultStatuses.unauthorized };
         }
-        if(oldSession!.expiresAt.getTime() < new Date().getTime()) {
-            return {data: null, status: ResultStatuses.unauthorized}
-        }
+        // if(oldSession!.expiresAt.getTime() < new Date().getTime()) {
+        //     return {data: null, status: ResultStatuses.unauthorized}
+        // }
         //протухаем старый рефреш-токен
-        await authCollection.updateOne({deviceId: token.jti},{$set: {
+        await authCollection.updateOne({deviceId: token.deviceId},{$set: {
                 revoked: true
         }});
         return {data: null, status: ResultStatuses.success}

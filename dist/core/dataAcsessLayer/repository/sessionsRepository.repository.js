@@ -33,7 +33,7 @@ exports.sessionsRepo = {
             if (!sessionFromRT) {
                 return ResultObject_type_1.ResultStatuses.notFound;
             }
-            if (sessionFromRT.deviceId !== session.deviceId) {
+            if (sessionFromRT.userId !== session.userId) {
                 return ResultObject_type_1.ResultStatuses.forbidden;
             }
             return ResultObject_type_1.ResultStatuses.success;

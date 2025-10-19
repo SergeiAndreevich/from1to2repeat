@@ -1,10 +1,10 @@
 import {Collection, Db, MongoClient} from "mongodb";
 import {TypeBlog} from "../../Entity/Blogs/Blog.types";
 import {TypePost} from "../../Entity/Posts/Post.types";
-import {TypeUser, TypeUserExtended} from "../../Entity/Users/User.types";
+import {TypeUserExtended} from "../../Entity/Users/User.types";
 import {TypeComment} from "../../Entity/Comments/Comment.types";
-import {TypeAccessDataModel} from "../dataAcsessLayer/repository/authRepository.repository";
 import {TypeSessionModel} from "../auth/auth.types";
+import {TypeRateLimitModel} from "../protection/Protection.types";
 
 export const dbSettings = {
     PORT: process.env.PORT || 5005,
@@ -19,6 +19,7 @@ export let postsCollection: Collection<TypePost>;
 export let usersCollection: Collection<TypeUserExtended>;
 export let commentsCollection: Collection<TypeComment>;
 export let authCollection: Collection<TypeSessionModel>;
+export let protectionCollection: Collection<TypeRateLimitModel>;
 
 export async function runDB(url:string):Promise<void> {
     //инициализация подключения к Монго, а именно к нашей БД
@@ -31,6 +32,7 @@ export async function runDB(url:string):Promise<void> {
     usersCollection= db.collection<TypeUserExtended>('users');
     commentsCollection= db.collection<TypeComment>('comments');
     authCollection= db.collection<TypeSessionModel>('auth');
+    protectionCollection= db.collection<TypeRateLimitModel>('protection');
 
     //тестовое подключение
     try{
