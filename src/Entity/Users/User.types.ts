@@ -4,7 +4,14 @@ export type TypeUser = {
     password: string,
     createdAt: Date
 }
-
+class User {
+    constructor(public login: string, public email: string, public password: string, public createdAt: Date) {
+        this.login = login;
+        this.email = email;
+        this.password = password;
+        this.createdAt = createdAt;
+    }
+}
 export type TypeUserExtended = {
     accountData:{
         login: string,
@@ -16,6 +23,23 @@ export type TypeUserExtended = {
         confirmationCode: string,
         expirationDate: Date,
         isConfirmed: boolean
+    }
+}
+class UserExtended {
+    constructor(
+        public accountData:{
+            login: string,
+            email: string,
+            password: string,
+            createdAt: Date
+        },
+        public emailConfirmation:{
+            confirmationCode: string,
+            expirationDate: Date,
+            isConfirmed: boolean
+        }
+    ){
+
     }
 }
 
