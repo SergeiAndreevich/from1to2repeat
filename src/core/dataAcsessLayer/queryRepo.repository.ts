@@ -245,7 +245,7 @@ import {mapSessionToView} from "../mappers/mapSessionsToView.mapper";
 //     }
 // }
 
-class QueryRepo {
+export class QueryRepo {
     async findUserByIdOrFail(userId:string):Promise<TypeUserViewModel| null>{
         const user = await usersCollection.findOne({_id: new ObjectId(userId)})
         if(!user){

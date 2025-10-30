@@ -1,36 +1,121 @@
-import {Router} from 'express';
+import {Request, Response, Router} from 'express';
 import {idValidation} from "../core/validation/paramsIdValidation.validation";
 import {
-    BlogsSortFields,
-    paginationAndSortingDefault,
+    BlogsSortFields, IPAginationAndSorting,
     PostsSortFields
 } from "../core/pagination/pagination-and-sorting.types";
-import {queryPaginationValidation} from "../core/validation/queryValidation.validation";
 import {checkValidationErrors} from "../core/errors/validationErrorResult.handler";
-import {getAllBlogsHandler} from "../Entity/Blogs/handlers/getAllBlogs.handler";
 import {basicGuard} from "../core/auth/basicGuard.middleware";
 import {blogInputValidation} from "../core/validation/blogInputValidation.validation";
 import {blogIdValidation} from "../core/validation/blogIdValidation.validation";
 import {PostToBlogInputValidation} from "../core/validation/postToBlogInputValidation.validation";
-import {getBlogByIdHandler} from "../Entity/Blogs/handlers/getBlogById.handler";
-import {createPostForSpecificBlogHandler} from "../Entity/Blogs/handlers/createPostForSpecificBlog.handler";
-import {createBlogHandler} from "../Entity/Blogs/handlers/createBlog.handler";
-import {updateBlogHandler} from "../Entity/Blogs/handlers/updateBlog.handler";
-import {removeBlogHandler} from "../Entity/Blogs/handlers/removeBlog.handler";
-import {getPostsForSpecificBlogHandler} from "../Entity/Blogs/handlers/getPostsForSpecificBlog.handler";
+import {setPaginationAndSortingFilter} from "../core/pagination/pagination-and-sorting.helper";
+import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
+import {httpStatus} from "../core/types/httpStatuses.type";
+import {BlogsService, blogsService} from "../Entity/Blogs/BLL/blogsService.bll";
 
 export const blogsRouter = Router({});
 
 //доработай эндпоинты, где есть query
 //чудеса! Убираю валидацию квери - и все работает
 
+export class BlogsController {
+    private queryRepo: QueryRepo
+    private blogsService: BlogsService
+    constructor() {
+        this.queryRepo = new QueryRepo();
+        this.blogsService = new BlogsService();
+    }
+    async getAllBlogsHandler(req:Request,res:Response){
+        const query:Partial<IPAginationAndSorting<BlogsSortFields>> = req.query;
+        const filter = setPaginationAndSortingFilter<BlogsSortFields>(query);
+        const blogsList = await this.queryRepo.findAllBlogsByFilter(filter);
+        res.status(httpStatus.Ok).send(blogsList)
+    }
+    async getBlogByIdHandler(req: Request, res: Response) {
+        const  blogId = req.params.id;
+        const blog = await this.queryRepo.findBlogByIdOrFail(blogId);
+        //отработали 404
+        if(blog === null) {
+            res.sendStatus(httpStatus.NotFound);
+            return
+        }
+        res.status(httpStatus.Ok).send(blog);
+    }
+    async getPostsForSpecificBlogHandler(req:Request,res:Response) {
+        const blogId = req.params.blogId;
+        const blog = await this.queryRepo.findBlogByIdOrFail(blogId);
+        //если блог не существует, то 404
+        if(!blog){
+            res.sendStatus(httpStatus.NotFound);
+            return
+        }
+        const query:Partial<IPAginationAndSorting<PostsSortFields>> = req.query;
+        const filter:IPAginationAndSorting<PostsSortFields> = setPaginationAndSortingFilter<PostsSortFields>(query);
+        const posts = await this.queryRepo.findAllPostsForBlog(blogId, filter);
+        res.status(httpStatus.Ok).send(posts)
+    }
+    async createPostForSpecificBlogHandler(req:Request,res:Response) {
+        const blog = await this.queryRepo.findBlogByIdOrFail(req.params.blogId);
+        //здесь отрабатывается 404
+        if(!blog){
+            res.sendStatus(httpStatus.NotFound);
+            return
+        }
+        const  createdPostId = await this.blogsService.createPostForSpecificBlog(req.params.blogId, req.body);
+        const post = await this.queryRepo.findPostByIdOrFail(createdPostId);
+        //доп проверка
+        if(!post){
+            res.sendStatus(httpStatus.NotFound);
+            return
+        }
+        res.status(httpStatus.Created).send(post)
+    }
+    async createBlogHandler(req:Request, res: Response) {
+        const createdId = await this.blogsService.createBlog(req.body);
+        if(!createdId){
+            //доп проверка
+            res.sendStatus(httpStatus.ExtraError);
+            return
+        }
+        const newBlog = await this.queryRepo.findBlogByIdOrFail(createdId);
+        //если все ок, то 201
+        res.status(httpStatus.Created).send(newBlog)
+    }
+    async updateBlogHandler(req:Request, res: Response) {
+        const blogId = req.params.id;
+        const blog = await this.queryRepo.findBlogByIdOrFail(blogId);
+        //отработали 404
+        if(!blog) {
+            res.sendStatus(httpStatus.NotFound);
+            return
+        }
+        await this.blogsService.updateBlog(blogId, req.body)
+        //отработали 204
+        res.sendStatus(httpStatus.NoContent)
+    }
+    async removeBlogHandler(req:Request, res: Response) {
+        const blogId = req.params.id;
+        const blog = await this.queryRepo.findBlogByIdOrFail(blogId);
+        //тут отработали 404
+        if(!blog) {
+            res.sendStatus(httpStatus.NotFound);
+            return
+        }
+        await this.blogsService.removeBlog(blogId);
+        //а здесь 204
+        res.sendStatus(httpStatus.NoContent)
+    }
+}
+const blogsController = new BlogsController();
+
 blogsRouter
-    .get('/', /*queryPaginationValidation(BlogsSortFields), checkValidationErrors,*/ getAllBlogsHandler)
-    .get('/:id', idValidation, checkValidationErrors,getBlogByIdHandler)
-    .get('/:blogId/posts', blogIdValidation, /*queryPaginationValidation(PostsSortFields),*/ checkValidationErrors, getPostsForSpecificBlogHandler)
-    .post('/:blogId/posts', basicGuard, blogIdValidation, PostToBlogInputValidation, checkValidationErrors, createPostForSpecificBlogHandler)
-    .post('/', basicGuard, blogInputValidation, checkValidationErrors, createBlogHandler)
-    .put('/:id', basicGuard, idValidation, blogInputValidation, checkValidationErrors, updateBlogHandler)
-    .delete('/:id', basicGuard, idValidation, checkValidationErrors, removeBlogHandler)
+    .get('/', /*queryPaginationValidation(BlogsSortFields), checkValidationErrors,*/ blogsController.getAllBlogsHandler.bind(blogsController))
+    .get('/:id', idValidation, checkValidationErrors,blogsController.getBlogByIdHandler.bind(blogsController))
+    .get('/:blogId/posts', blogIdValidation, /*queryPaginationValidation(PostsSortFields),*/ checkValidationErrors, blogsController.getPostsForSpecificBlogHandler.bind(blogsController))
+    .post('/:blogId/posts', basicGuard, blogIdValidation, PostToBlogInputValidation, checkValidationErrors, blogsController.createPostForSpecificBlogHandler.bind(blogsController))
+    .post('/', basicGuard, blogInputValidation, checkValidationErrors, blogsController.createBlogHandler.bind(blogsController))
+    .put('/:id', basicGuard, idValidation, blogInputValidation, checkValidationErrors, blogsController.updateBlogHandler.bind(blogsController))
+    .delete('/:id', basicGuard, idValidation, checkValidationErrors, blogsController.removeBlogHandler.bind(blogsController))
 
 //проверил в постмене - все корректно. Единственное - где был косяк - это req.params - имя должно совпадать с тем, что здесь
