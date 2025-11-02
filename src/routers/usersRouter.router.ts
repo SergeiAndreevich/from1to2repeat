@@ -12,18 +12,17 @@ import {setPaginationAndSortingFilter} from "../core/pagination/pagination-and-s
 import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../core/types/httpStatuses.type";
 import {TypeUserInputModel, TypeUserViewModel} from "../Entity/Users/User.types";
-import {UsersService, usersService} from "../Entity/Users/BLL/usersService.bll";
+import {UsersService} from "../Entity/Users/BLL/usersService.bll";
 import {ResultStatuses} from "../core/types/ResultObject.type";
 import {usersRepository} from "../core/dataAcsessLayer/repository/usersRepository.repository";
+import {usersController} from "../composition-root";
 
 export const usersRouter = Router({});
 
-class UsersController {
-    private queryRepo: QueryRepo;
-    private usersService: UsersService;
-    constructor() {
-        this.queryRepo = new QueryRepo();
-        this.usersService = new UsersService();
+export class UsersController {
+
+    constructor(protected queryRepo: QueryRepo,
+                protected usersService: UsersService) {
     }
     async getUsersHandler (req:Request, res: Response){
         const query:Partial<IPAginationAndSorting<UsersSortFields>> = req.query;
@@ -62,7 +61,6 @@ class UsersController {
         res.sendStatus(httpStatus.NoContent)
     }
 }
-const usersController  = new UsersController();
 
 usersRouter
     .get('/', basicGuard, /*queryPaginationValidation(UsersSortFields),*/ checkValidationErrors, usersController.getUsersHandler.bind(usersController))

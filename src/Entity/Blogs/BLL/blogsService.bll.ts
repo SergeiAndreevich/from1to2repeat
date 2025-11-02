@@ -40,14 +40,9 @@ import {BlogsRepository, blogsRepository} from "../../../core/dataAcsessLayer/re
 // }
 
 export class BlogsService {
-    private queryRepo: QueryRepo;
-    private postsRepository: PostsRepository;
-    private blogsRepository: BlogsRepository;
-    constructor() {
-        this.queryRepo = new QueryRepo();
-        this.postsRepository = new PostsRepository();
-        this.blogsRepository = new BlogsRepository();
-    }
+    constructor(protected queryRepo: QueryRepo,
+                protected postsRepository: PostsRepository,
+                protected blogsRepository: BlogsRepository) {}
 
     async createPostForSpecificBlog(blogId: string, dto: TypeBlogPostInputModel) {
         const blog = await this.queryRepo.findBlogByIdOrFail(blogId);
@@ -83,4 +78,3 @@ export class BlogsService {
     }
 }
 
-export const blogsService = new BlogsService();

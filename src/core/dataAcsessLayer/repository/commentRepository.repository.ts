@@ -22,7 +22,7 @@ import {TypeComment, TypeCommentInputModel} from "../../../Entity/Comments/Comme
 //     }
 // }
 
-class CommentRepository {
+export class CommentRepository {
     async removeComment(commentId: string) {
         await commentsCollection.deleteOne({_id: new ObjectId(commentId)});
         return

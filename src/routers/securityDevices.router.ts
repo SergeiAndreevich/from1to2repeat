@@ -4,23 +4,21 @@ import {removeOtherSessionsHandler} from "../core/auth/sessions/removeOtherSessi
 import {removeThisSessionHandler} from "../core/auth/sessions/removeThisSession.handler";
 import {checkValidationErrors} from "../core/errors/validationErrorResult.handler";
 import {deviceIdValidation} from "../core/validation/deviceIdValidation.validation";
-import {sessionsRepo, SessionsRepo} from "../core/dataAcsessLayer/repository/sessionsRepository.repository";
+import {SessionsRepo} from "../core/dataAcsessLayer/repository/sessionsRepository.repository";
 import {httpStatus} from "../core/types/httpStatuses.type";
 import {jwtHelper} from "../core/helpers/jwt.helper";
 import {SessionsService, sessionsService} from "../core/auth/BLL/sessionsService.bll";
 import {ResultStatuses} from "../core/types/ResultObject.type";
 import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
+import {securityController} from "../composition-root";
 
 export const securityRouter = Router({});
 
-class SecurityController {
-    private sessionsRepo: SessionsRepo;
-    private sessionsService: SessionsService;
-    private queryRepo: QueryRepo;
-    constructor(){
-        this.sessionsRepo = new SessionsRepo();
-        this.sessionsService = new SessionsService();
-        this.queryRepo = new QueryRepo();
+export class SecurityController {
+
+    constructor( protected sessionsRepo: SessionsRepo,
+                protected sessionsService: SessionsService,
+                protected queryRepo: QueryRepo){
     }
     async getAllDevicesHandler(req:Request,res:Response){
         //условие гуарда здесь валидный рефреш токен. И только!
@@ -87,7 +85,6 @@ class SecurityController {
         }
     }
 }
-const securityController = new SecurityController();
 
 securityRouter
     .get('/devices', securityController.getAllDevicesHandler.bind(securityController))  //выдаем массив всех сессий

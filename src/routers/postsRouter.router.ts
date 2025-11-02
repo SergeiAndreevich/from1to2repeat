@@ -21,21 +21,17 @@ import {
     PostsSortFields
 } from "../core/pagination/pagination-and-sorting.types";
 import {setPaginationAndSortingFilter} from "../core/pagination/pagination-and-sorting.helper";
-import {PostsService, postsService} from "../Entity/Posts/BLL/postsService.bll";
+import {PostsService} from "../Entity/Posts/BLL/postsService.bll";
 import {TypeCommentatorInfo, TypeCommentInputModel} from "../Entity/Comments/Comment.types";
-import {CommentService, commentService} from "../Entity/Comments/BLL/commentService.bll";
+import {CommentService} from "../Entity/Comments/BLL/commentService.bll";
+import {postsController} from "../composition-root";
 
 export const postsRouter = Router({});
 
-class PostsController {
-    private queryRepo: QueryRepo;
-    private postsService: PostsService;
-    private commentService: CommentService;
-    constructor(){
-        this.queryRepo = new QueryRepo();
-        this.postsService = new PostsService();
-        this.commentService = new CommentService();
-    }
+export class PostsController {
+    constructor(protected queryRepo: QueryRepo,
+                protected postsService: PostsService,
+                protected commentService: CommentService){}
     async getAllPostsHandler(req:Request, res:Response) {
         const query:Partial<IPAginationAndSorting<PostsSortFields>> = req.query;
         const filter = setPaginationAndSortingFilter<PostsSortFields>(query);
@@ -135,7 +131,6 @@ class PostsController {
         res.status(httpStatus.Ok).send(commentList)
     }
 }
-const postsController = new PostsController();
 
 postsRouter
     .get('/', /*queryPaginationValidation(PostsSortFields), checkValidationErrors,*/ postsController.getAllPostsHandler.bind(postsController))

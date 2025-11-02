@@ -8,17 +8,15 @@ import {updateCommentHandler} from "../Entity/Comments/handlers/updateComment.ha
 import {removeCommentByIdHandler} from "../Entity/Comments/handlers/removeCommentById.handler";
 import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../core/types/httpStatuses.type";
-import {CommentService, commentService} from "../Entity/Comments/BLL/commentService.bll";
+import {CommentService} from "../Entity/Comments/BLL/commentService.bll";
+import {commentController} from "../composition-root";
 
 export const commentsRouter = Router({});
 
 export class CommentsController {
-    private queryRepo: QueryRepo;
-    private commentService: CommentService;
-    constructor() {
-        this.queryRepo = new QueryRepo();
-        this.commentService = new CommentService();
-    }
+
+    constructor(protected queryRepo: QueryRepo,
+                protected commentService: CommentService) {}
     async getCommentByIdHandler(req:Request, res: Response) {
         const comment = await this.queryRepo.findCommentByIdOrFail(req.params.id);
         if(!comment) {
@@ -70,7 +68,6 @@ export class CommentsController {
         res.sendStatus(httpStatus.Forbidden)
     }
 }
-const commentController = new CommentsController();
 commentsRouter
     .get('/:id', idValidation, checkValidationErrors, commentController.getCommentByIdHandler.bind(commentController))
     .put('/:id', tokenGuard, idValidation, commentInputValidation, checkValidationErrors, commentController.updateCommentHandler.bind(commentController))

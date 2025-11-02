@@ -12,7 +12,8 @@ import {PostToBlogInputValidation} from "../core/validation/postToBlogInputValid
 import {setPaginationAndSortingFilter} from "../core/pagination/pagination-and-sorting.helper";
 import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../core/types/httpStatuses.type";
-import {BlogsService, blogsService} from "../Entity/Blogs/BLL/blogsService.bll";
+import {BlogsService} from "../Entity/Blogs/BLL/blogsService.bll";
+import {blogsController} from "../composition-root";
 
 export const blogsRouter = Router({});
 
@@ -24,12 +25,7 @@ export const blogsRouter = Router({});
 //содержащим вложенность, то я как бы создаю их экземпляр здесь и обращаюсь не как к испортируемуму
 //модулю, а как к экземпляру=свойству данного класса
 export class BlogsController {
-    private queryRepo: QueryRepo
-    private blogsService: BlogsService
-    constructor() {
-        this.queryRepo = new QueryRepo();
-        this.blogsService = new BlogsService();
-    }
+    constructor(protected queryRepo: QueryRepo, protected blogsService: BlogsService) {}
     async getAllBlogsHandler(req:Request,res:Response){
         const query:Partial<IPAginationAndSorting<BlogsSortFields>> = req.query;
         const filter = setPaginationAndSortingFilter<BlogsSortFields>(query);
@@ -111,7 +107,6 @@ export class BlogsController {
         res.sendStatus(httpStatus.NoContent)
     }
 }
-const blogsController = new BlogsController();
 
 blogsRouter
     .get('/', /*queryPaginationValidation(BlogsSortFields), checkValidationErrors,*/ blogsController.getAllBlogsHandler.bind(blogsController))

@@ -70,4 +70,3 @@ export class SessionsRepo{
     }
 }
 
-export const sessionsRepo = new SessionsRepo()

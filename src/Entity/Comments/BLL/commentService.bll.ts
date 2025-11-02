@@ -1,5 +1,8 @@
 import {TypeComment, TypeCommentatorInfo, TypeCommentInputModel} from "../Comment.types";
-import {commentRepository} from "../../../core/dataAcsessLayer/repository/commentRepository.repository";
+import {
+    CommentRepository,
+    commentRepository
+} from "../../../core/dataAcsessLayer/repository/commentRepository.repository";
 
 // export const commentService = {
 //     async updateComment(commentId:string, dto: TypeCommentInputModel){
@@ -23,6 +26,7 @@ import {commentRepository} from "../../../core/dataAcsessLayer/repository/commen
 // }
 
 export class CommentService {
+    constructor(protected commentRepository: CommentRepository) {}
     async updateComment(commentId:string, dto: TypeCommentInputModel){
         await commentRepository.updateComment(commentId, dto);
         return
@@ -43,4 +47,3 @@ export class CommentService {
     }
 }
 
-export const commentService = new CommentService();
