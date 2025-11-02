@@ -124,7 +124,7 @@ type TypeTestExportData ={
 //     }
 // }
 
-class UsersService {
+export class UsersService {
     async createUser(userInput: TypeUserInputModel): Promise<IResult<TypeTestExportData | null>> {
         //проверяем, существует ли уже пользователь с такими login/email
         const userByLogin = await usersRepository.findUserByLoginOrFail(userInput.login);
@@ -229,6 +229,10 @@ class UsersService {
         const code = uuidv4();
         await usersRepository.updateConfirmationCode(email, code);
         const result = await nodemailerHelper.sendConfirmationEmail(email, code);
+        return
+    }
+    async removeUser(userId: string){
+        await usersRepository.removeUser(userId);
         return
     }
 }

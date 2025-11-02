@@ -22,7 +22,7 @@ import {commentRepository} from "../../../core/dataAcsessLayer/repository/commen
 //     }
 // }
 
-class CommentService {
+export class CommentService {
     async updateComment(commentId:string, dto: TypeCommentInputModel){
         await commentRepository.updateComment(commentId, dto);
         return

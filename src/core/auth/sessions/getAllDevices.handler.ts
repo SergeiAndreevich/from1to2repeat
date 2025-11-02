@@ -5,7 +5,7 @@ import {sessionsRepo} from "../../dataAcsessLayer/repository/sessionsRepository.
 
 export async function getAllDevicesHandler(req:Request,res:Response){
     //условие гуарда здесь валидный рефреш токен. И только!
-    console.log("----------------Getting all devices");
+    //console.log("----------------Getting all devices");
     const refreshToken = req.cookies.refreshToken;
     if(!refreshToken){
         res.sendStatus(httpStatus.Unauthorized);
@@ -16,7 +16,7 @@ export async function getAllDevicesHandler(req:Request,res:Response){
         res.sendStatus(httpStatus.Unauthorized);
         return
     }
-    console.log('IN DEVICES GET --- DECODED REFRESH TOKEN',decodedRefresh);
+    //console.log('IN DEVICES GET --- DECODED REFRESH TOKEN',decodedRefresh);
 
     const sessions = await sessionsRepo.findSessionsByUserId(decodedRefresh.userId);
     if(sessions.length < 1){
@@ -25,6 +25,6 @@ export async function getAllDevicesHandler(req:Request,res:Response){
         return
     }
     //а вдруг он только зашел и хочет посмотреть, есть ли там что. Ну как минимум одно ведь должно же быть активно
-    console.log('SESSIONS IN GET./devices', sessions);
+    //console.log('SESSIONS IN GET./devices', sessions);
     res.status(httpStatus.Ok).send(sessions)
 }

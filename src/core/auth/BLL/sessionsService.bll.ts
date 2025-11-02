@@ -36,7 +36,7 @@ import {TypeSessionToViewModel} from "../auth.types";
 //     }
 // }
 
-class SessionsService {
+export class SessionsService {
     async getSessions(userId:string) {
         return await sessionsRepo.findSessionsByUserId(userId)
     }

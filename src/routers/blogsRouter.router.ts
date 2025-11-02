@@ -19,6 +19,10 @@ export const blogsRouter = Router({});
 //доработай эндпоинты, где есть query
 //чудеса! Убираю валидацию квери - и все работает
 
+
+//при переходе к классам я создаю класс и если в этом классе есть обращение к др классам,
+//содержащим вложенность, то я как бы создаю их экземпляр здесь и обращаюсь не как к испортируемуму
+//модулю, а как к экземпляру=свойству данного класса
 export class BlogsController {
     private queryRepo: QueryRepo
     private blogsService: BlogsService
@@ -118,4 +122,13 @@ blogsRouter
     .put('/:id', basicGuard, idValidation, blogInputValidation, checkValidationErrors, blogsController.updateBlogHandler.bind(blogsController))
     .delete('/:id', basicGuard, idValidation, checkValidationErrors, blogsController.removeBlogHandler.bind(blogsController))
 
-//проверил в постмене - все корректно. Единственное - где был косяк - это req.params - имя должно совпадать с тем, что здесь
+//биндим мы для того, чтобы явно указать контекст, т.е.
+// const a = {
+//     age: 10,
+//     getAge(){console.log(this.age)}
+// }
+// const b = {
+//     age:2,
+//     getNewAge: a.getAge
+// }
+//и вот во втором случае контекстом будет уже объект b, вывыдется 2, поэтому нужно явно указывать

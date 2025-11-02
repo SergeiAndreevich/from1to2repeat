@@ -38,7 +38,7 @@ import {JwtPayload} from "jsonwebtoken";
 //     }
 // }
 
-class SessionsRepo{
+export class SessionsRepo{
     async findSessionsByUserId(userId:string) {
         const sessions = await authCollection.find({userId: userId, revoked:false}).toArray();
         return sessions.map(session => mapSessionToView(session));

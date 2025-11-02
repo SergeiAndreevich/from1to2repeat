@@ -25,7 +25,7 @@ import {ObjectId} from "mongodb";
 //     },
 // }
 
-class BlogsRepository {
+export class BlogsRepository {
     async createBlog(blog: TypeBlog) {
         const newBlog = await blogsCollection.insertOne(blog);
         return newBlog.insertedId.toString()

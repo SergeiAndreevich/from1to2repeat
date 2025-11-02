@@ -28,7 +28,7 @@ import {postsRepository} from "../../../core/dataAcsessLayer/repository/postsRep
 //     }
 // }
 
-class PostsService {
+export class PostsService {
     async  createPost(dto: TypePostInputModel){
         const blog = await queryRepo.findBlogByIdOrFail(dto.blogId);
         const newPost:TypePost = {
