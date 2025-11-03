@@ -33,4 +33,13 @@ export const securityController = new SecurityController(sessionsRepo, sessionsS
 export const usersController = new UsersController(queryRepo,usersService);
 
 
-//а че везде надо прописывать в классах this?
+//а че везде надо прописывать в классах this? yes!
+//а теперь напишем кривой, но по сути верный ioc
+const data = [];
+data.push(queryRepo,sessionsRepo,blogsRepository,postsRepository,commentRepository,blogsService,postsService,
+    commentService,sessionsService,usersService,blogsController, commentController, postsController,securityController, usersController);
+export const ioc = {
+    getInstance(){
+
+    }
+}

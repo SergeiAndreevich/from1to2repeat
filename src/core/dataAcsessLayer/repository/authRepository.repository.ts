@@ -1,4 +1,4 @@
-import {authCollection} from "../../db/mongoDB.db";
+import {authCollection, usersCollection} from "../../db/mongoDB.db";
 import {JwtPayload} from "jsonwebtoken";
 import {IResult, ResultStatuses} from "../../types/ResultObject.type";
 import {jwtHelper} from "../../helpers/jwt.helper";
@@ -178,6 +178,17 @@ class AuthRepo {
                 revoked: true
             }});
         return {data: null, status: ResultStatuses.success}
+    }
+    async recoveryPassword(email: string): Promise<IResult<null | string>> {
+        let result: IResult;
+        //проверяем, есть ли такой email
+        const user = usersCollection.findOne({"accountData.email": email});
+        if(!user) {
+            result = {data: null, status: ResultStatuses.notFound}
+            return result
+        }
+
+        return
     }
 }
 

@@ -126,6 +126,16 @@ class AuthService {
         const result = await authRepo.removeRefreshToken(decodedRefresh);
         return {data: result.data, status: result.status}
     }
+    async recoveryPassword(email:string): Promise<void> {
+        //отдаем в repository и если такой есть, то отправляем туда код
+        const result = await authRepo.recoveryPassword(email);
+        return result
+    }
+    async setNewPassword(code: string, newPassword: string){
+        //отдаем код и пароль в репозиторий, если код ок, то обновляем запись о пароле
+        const result = await authRepo.setNewPassword(code, newPassword);
+        return result
+    }
 }
 
 export const authService =  new AuthService();

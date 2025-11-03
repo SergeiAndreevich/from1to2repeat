@@ -17,6 +17,9 @@ import {resendConfirmationHandler} from "../core/auth/handlers/resendConfirmatio
 import {refreshHandler} from "../core/auth/handlers/refreshToken.handler";
 import {logoutHandler} from "../core/auth/handlers/logout.handler";
 import {antiClicker} from "../core/protection/antiClicker.middleware";
+import {passwordRecoveryHandler} from "../core/auth/handlers/passwordRecovery.handler";
+import {setNewPasswordHandler} from "../core/auth/handlers/setNewPassword.handler";
+import {codeAndPasswordValidation} from "../core/validation/recoveryCodeAndPasswordValidation.validation";
 
 export const authRouter = Router({});
 
@@ -28,6 +31,8 @@ authRouter
     .post('/registration-email-resending', antiClicker, emailValidation, checkValidationErrors, resendConfirmationHandler) //переотправили письмо с кодом
     .post('/refresh-token', antiClicker, refreshHandler) //выдаем новый рефреш-токен по старому
     .post('/logout', antiClicker, logoutHandler) //протухаем рефреш токен и больше не выдаем новых
+    .post('/password-recovery', emailValidation, checkValidationErrors, passwordRecoveryHandler) //ввел email, на него нужно отправить письмо с recovery-code
+    .post('/new-password', codeAndPasswordValidation, checkValidationErrors, setNewPasswordHandler ) //отдаем recovery-code и новый пароль: код как допуск, стираем старый пароль, записываем новый
 
 // В базе данных, кроме даты выдачи токена,
 //     храним так же дату окончания действия токена, для того, чтобы можно было периодически зачищать девайсы (сессии) с "протухшиими" токенами;
