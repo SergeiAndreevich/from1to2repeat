@@ -2,7 +2,7 @@ import {IResult, ResultStatuses} from "../../types/ResultObject.type";
 import {usersCollection} from "../../db/mongoDB.db";
 import {TypeUser, TypeUserExtended} from "../../../Entity/Users/User.types";
 import {ObjectId} from "mongodb";
-import {usersService} from "../../../Entity/Users/BLL/usersService.bll";
+import {injectable} from "inversify";
 
 // export const usersRepository = {
 //     async findUserByLoginOrFail(userLogin: string): Promise<IResult<string | null>> {
@@ -63,7 +63,8 @@ import {usersService} from "../../../Entity/Users/BLL/usersService.bll";
 //         return
 //     }
 // }
-class UsersRepository {
+@injectable()
+export class UsersRepository {
     async findUserByLoginOrFail(userLogin: string): Promise<IResult<string | null>> {
         const user = await usersCollection.findOne({"accountData.login": userLogin});
         if (!user) {

@@ -1,6 +1,7 @@
 import {TypeBlog, TypeBlogInputModel} from "../../../Entity/Blogs/Blog.types";
 import {blogsCollection} from "../../db/mongoDB.db";
 import {ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
 //
 // export const blogsRepository = {
@@ -25,6 +26,7 @@ import {ObjectId} from "mongodb";
 //     },
 // }
 
+@injectable()
 export class BlogsRepository {
     async createBlog(blog: TypeBlog) {
         const newBlog = await blogsCollection.insertOne(blog);
@@ -47,4 +49,3 @@ export class BlogsRepository {
     }
 }
 
-export const blogsRepository = new BlogsRepository()

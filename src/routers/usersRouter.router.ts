@@ -1,3 +1,4 @@
+import {inject, injectable} from "inversify";
 import {Request, Response, Router} from 'express';
 import {queryPaginationValidation} from "../core/validation/queryValidation.validation";
 import {IPAginationAndSorting, UsersSortFields} from "../core/pagination/pagination-and-sorting.types";
@@ -15,14 +16,15 @@ import {TypeUserInputModel, TypeUserViewModel} from "../Entity/Users/User.types"
 import {UsersService} from "../Entity/Users/BLL/usersService.bll";
 import {ResultStatuses} from "../core/types/ResultObject.type";
 import {usersRepository} from "../core/dataAcsessLayer/repository/usersRepository.repository";
-import {usersController} from "../composition-root";
+import {container} from "../composition-root";
 
 export const usersRouter = Router({});
 
+@injectable()
 export class UsersController {
 
-    constructor(protected queryRepo: QueryRepo,
-                protected usersService: UsersService) {
+    constructor(@inject(QueryRepo)protected queryRepo: QueryRepo,
+                @inject(UsersService)protected usersService: UsersService) {
     }
     async getUsersHandler (req:Request, res: Response){
         const query:Partial<IPAginationAndSorting<UsersSortFields>> = req.query;
@@ -61,6 +63,7 @@ export class UsersController {
         res.sendStatus(httpStatus.NoContent)
     }
 }
+const usersController = container.get(UsersController)
 
 usersRouter
     .get('/', basicGuard, /*queryPaginationValidation(UsersSortFields),*/ checkValidationErrors, usersController.getUsersHandler.bind(usersController))

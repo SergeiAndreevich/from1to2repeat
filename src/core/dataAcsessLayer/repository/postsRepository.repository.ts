@@ -1,6 +1,7 @@
 import {TypePost, TypePostInputModel} from "../../../Entity/Posts/Post.types";
 import {postsCollection} from "../../db/mongoDB.db";
 import {ObjectId} from "mongodb";
+import {injectable} from "inversify";
 
 // export const postsRepository = {
 //     async createPost(newPost: TypePost) {
@@ -25,6 +26,7 @@ import {ObjectId} from "mongodb";
 //     },
 // }
 
+@injectable()
 export class PostsRepository {
     async createPost(newPost: TypePost) {
         const createdPost = await postsCollection.insertOne(newPost);
@@ -48,4 +50,3 @@ export class PostsRepository {
     }
 }
 
-export const postsRepository = new PostsRepository();

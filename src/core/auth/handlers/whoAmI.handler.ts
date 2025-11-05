@@ -1,7 +1,7 @@
 import {Request,Response} from "express";
 import {queryRepo} from "../../dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../../types/httpStatuses.type";
-type TypeMeViewModel = {
+export type TypeMeViewModel = {
     "email": "string",
     "login": "string",
     "userId": "string"

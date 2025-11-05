@@ -3,6 +3,7 @@ import {
     CommentRepository,
     commentRepository
 } from "../../../core/dataAcsessLayer/repository/commentRepository.repository";
+import {inject, injectable} from "inversify";
 
 // export const commentService = {
 //     async updateComment(commentId:string, dto: TypeCommentInputModel){
@@ -25,10 +26,11 @@ import {
 //     }
 // }
 
+@injectable()
 export class CommentService {
-    constructor(protected commentRepository: CommentRepository) {}
+    constructor(@inject(CommentRepository)protected commentRepository: CommentRepository) {}
     async updateComment(commentId:string, dto: TypeCommentInputModel){
-        await commentRepository.updateComment(commentId, dto);
+        await this.commentRepository.updateComment(commentId, dto);
         return
     }
     async createComment(postId:string, commentContent: TypeCommentInputModel, userInfo:TypeCommentatorInfo){
@@ -38,11 +40,11 @@ export class CommentService {
             createdAt: new Date(),
             postId: postId
         }
-        const createdId = await commentRepository.createComment(comment);
+        const createdId = await this.commentRepository.createComment(comment);
         return createdId
     }
     async removeComment(commentId:string){
-        await commentRepository.removeComment(commentId);
+        await this.commentRepository.removeComment(commentId);
         return
     }
 }

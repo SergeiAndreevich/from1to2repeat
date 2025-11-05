@@ -3,6 +3,7 @@ import {JwtPayload} from "jsonwebtoken";
 import {IResult, ResultStatuses} from "../../types/ResultObject.type";
 import {jwtHelper} from "../../helpers/jwt.helper";
 import {TypeSessionModel, TypeSessionUpdateModel} from "../../auth/auth.types";
+import {injectable} from "inversify";
 
 export type TypeAccessDataModel = {
     jti: string;
@@ -98,7 +99,8 @@ export type TypeAccessDataModel = {
 //     }
 // }
 
-class AuthRepo {
+@injectable()
+export class AuthRepo {
     async addSession(data: TypeSessionModel){
         await authCollection.insertOne(data);
         console.log('CREATED SESSION IN LOGIN',  data);

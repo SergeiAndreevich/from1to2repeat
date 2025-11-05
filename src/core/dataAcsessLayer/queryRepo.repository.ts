@@ -15,6 +15,7 @@ import {TypeComment, TypeCommentViewModel} from "../../Entity/Comments/Comment.t
 import {mapCommentToView} from "../mappers/mapCommentToView.mapper";
 import {TypePost, TypePostViewModel} from "../../Entity/Posts/Post.types";
 import {mapSessionToView} from "../mappers/mapSessionsToView.mapper";
+import {injectable} from "inversify/lib/esm";
 
 //не забудь потом вернуться к пагинации и поправить типы. Как в валидации, так и в приходящей dto
 
@@ -245,6 +246,7 @@ import {mapSessionToView} from "../mappers/mapSessionsToView.mapper";
 //     }
 // }
 
+@injectable()
 export class QueryRepo {
     async findUserByIdOrFail(userId:string):Promise<TypeUserViewModel| null>{
         const user = await usersCollection.findOne({_id: new ObjectId(userId)})

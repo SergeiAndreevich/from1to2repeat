@@ -13,7 +13,8 @@ import {setPaginationAndSortingFilter} from "../core/pagination/pagination-and-s
 import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../core/types/httpStatuses.type";
 import {BlogsService} from "../Entity/Blogs/BLL/blogsService.bll";
-import {blogsController} from "../composition-root";
+import { container} from "../composition-root";
+import {inject, injectable} from "inversify";
 
 export const blogsRouter = Router({});
 
@@ -24,8 +25,10 @@ export const blogsRouter = Router({});
 //при переходе к классам я создаю класс и если в этом классе есть обращение к др классам,
 //содержащим вложенность, то я как бы создаю их экземпляр здесь и обращаюсь не как к испортируемуму
 //модулю, а как к экземпляру=свойству данного класса
+@injectable()
 export class BlogsController {
-    constructor(protected queryRepo: QueryRepo, protected blogsService: BlogsService) {}
+    constructor(@inject(QueryRepo)protected queryRepo: QueryRepo,
+                @inject(BlogsService) protected blogsService: BlogsService) {}
     async getAllBlogsHandler(req:Request,res:Response){
         const query:Partial<IPAginationAndSorting<BlogsSortFields>> = req.query;
         const filter = setPaginationAndSortingFilter<BlogsSortFields>(query);
@@ -107,6 +110,8 @@ export class BlogsController {
         res.sendStatus(httpStatus.NoContent)
     }
 }
+
+const blogsController = container.get(BlogsController);
 
 blogsRouter
     .get('/', /*queryPaginationValidation(BlogsSortFields), checkValidationErrors,*/ blogsController.getAllBlogsHandler.bind(blogsController))

@@ -5,6 +5,7 @@ import {jwtHelper} from "../../helpers/jwt.helper";
 import {httpStatus} from "../../types/httpStatuses.type";
 import {TypeSessionModel, TypeSessionToViewModel} from "../../auth/auth.types";
 import {JwtPayload} from "jsonwebtoken";
+import {injectable} from "inversify";
 
 // export const sessionsRepo = {
 //     async findSessionsByUserId(userId:string) {
@@ -38,6 +39,7 @@ import {JwtPayload} from "jsonwebtoken";
 //     }
 // }
 
+@injectable()
 export class SessionsRepo{
     async findSessionsByUserId(userId:string) {
         const sessions = await authCollection.find({userId: userId, revoked:false}).toArray();

@@ -1,24 +1,21 @@
 import {Request, Response, Router} from "express";
-import {getAllDevicesHandler} from "../core/auth/sessions/getAllDevices.handler";
-import {removeOtherSessionsHandler} from "../core/auth/sessions/removeOtherSessions.handler";
-import {removeThisSessionHandler} from "../core/auth/sessions/removeThisSession.handler";
 import {checkValidationErrors} from "../core/errors/validationErrorResult.handler";
 import {deviceIdValidation} from "../core/validation/deviceIdValidation.validation";
 import {SessionsRepo} from "../core/dataAcsessLayer/repository/sessionsRepository.repository";
 import {httpStatus} from "../core/types/httpStatuses.type";
 import {jwtHelper} from "../core/helpers/jwt.helper";
-import {SessionsService, sessionsService} from "../core/auth/BLL/sessionsService.bll";
+import {SessionsService} from "../core/auth/BLL/sessionsService.bll";
 import {ResultStatuses} from "../core/types/ResultObject.type";
 import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
-import {securityController} from "../composition-root";
+import {container} from "../composition-root";
+import {inject, injectable} from "inversify";
 
 export const securityRouter = Router({});
-
+@injectable()
 export class SecurityController {
-
-    constructor( protected sessionsRepo: SessionsRepo,
-                protected sessionsService: SessionsService,
-                protected queryRepo: QueryRepo){
+    constructor(@inject(SessionsRepo) protected sessionsRepo: SessionsRepo,
+                @inject(SessionsService) protected sessionsService: SessionsService,
+                @inject(QueryRepo) protected queryRepo: QueryRepo){
     }
     async getAllDevicesHandler(req:Request,res:Response){
         //условие гуарда здесь валидный рефреш токен. И только!
@@ -86,6 +83,7 @@ export class SecurityController {
     }
 }
 
+const securityController = container.get(SecurityController);
 securityRouter
     .get('/devices', securityController.getAllDevicesHandler.bind(securityController))  //выдаем массив всех сессий
     .delete('/devices', securityController.removeOtherSessionsHandler.bind(securityController)) //протухаем все сессии, кроме текущей

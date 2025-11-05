@@ -9,14 +9,15 @@ import {removeCommentByIdHandler} from "../Entity/Comments/handlers/removeCommen
 import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../core/types/httpStatuses.type";
 import {CommentService} from "../Entity/Comments/BLL/commentService.bll";
-import {commentController} from "../composition-root";
+import {inject, injectable} from "inversify";
+import {container} from "../composition-root";
 
 export const commentsRouter = Router({});
 
+@injectable()
 export class CommentsController {
-
-    constructor(protected queryRepo: QueryRepo,
-                protected commentService: CommentService) {}
+    constructor(@inject(QueryRepo)protected queryRepo: QueryRepo,
+                @inject(CommentService) protected commentService: CommentService) {}
     async getCommentByIdHandler(req:Request, res: Response) {
         const comment = await this.queryRepo.findCommentByIdOrFail(req.params.id);
         if(!comment) {
@@ -68,6 +69,9 @@ export class CommentsController {
         res.sendStatus(httpStatus.Forbidden)
     }
 }
+
+const commentController = container.get(CommentsController);
+
 commentsRouter
     .get('/:id', idValidation, checkValidationErrors, commentController.getCommentByIdHandler.bind(commentController))
     .put('/:id', tokenGuard, idValidation, commentInputValidation, checkValidationErrors, commentController.updateCommentHandler.bind(commentController))

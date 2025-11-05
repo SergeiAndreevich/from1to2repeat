@@ -3,11 +3,13 @@ import {bcryptHelper} from "../../../core/helpers/bcrypt.helper";
 import {repository} from "../../../core/dataAcsessLayer/repository.repository";
 import {IResult, ResultStatuses} from "../../../core/types/ResultObject.type";
 import {usersCollection} from "../../../core/db/mongoDB.db";
-import {usersRepository} from "../../../core/dataAcsessLayer/repository/usersRepository.repository";
+import {UsersRepository, usersRepository} from "../../../core/dataAcsessLayer/repository/usersRepository.repository";
 import { v4 as uuidv4 } from "uuid";
 import { add } from "date-fns";
 import {nodemailerHelper} from "../../../core/helpers/nodemailer.helper";
 import {TypeMyError} from "../../../core/errors/validationErrorResult.handler";
+import {injectable} from "inversify/lib/esm";
+import {inject} from "inversify";
 
 export const SALT_ROUNDS = 10;
 type TypeTestExportData ={
@@ -123,12 +125,14 @@ type TypeTestExportData ={
 //         return
 //     }
 // }
-
+@injectable()
 export class UsersService {
+    constructor(@inject(UsersRepository) protected usersRepository: UsersRepository) {
+    }
     async createUser(userInput: TypeUserInputModel): Promise<IResult<TypeTestExportData | null>> {
         //проверяем, существует ли уже пользователь с такими login/email
-        const userByLogin = await usersRepository.findUserByLoginOrFail(userInput.login);
-        const userByEmail = await usersRepository.findUserByEmailOrFail(userInput.email);
+        const userByLogin = await this.usersRepository.findUserByLoginOrFail(userInput.login);
+        const userByEmail = await this.usersRepository.findUserByEmailOrFail(userInput.email);
 
         //если есть такой логин ИЛИ email, то возвращаем null и статус
         if( userByLogin.status === ResultStatuses.success) {
@@ -172,7 +176,7 @@ export class UsersService {
         }
 
         //отправляем в БД, чтобы получить его id
-        const createdId:string = await usersRepository.createUser(newUser);
+        const createdId:string = await this.usersRepository.createUser(newUser);
 
         //отправляем письмо на почту для подтверждения
         const result = await nodemailerHelper.sendConfirmationEmail(newUser.accountData.email, confirmationCode);
@@ -185,8 +189,8 @@ export class UsersService {
     }
     async createUserBySuperAdmin(userInput: TypeUserInputModel): Promise<IResult<string | null>>{
         //проверяем, существует ли уже пользователь с такими login/email
-        const userByLogin = await usersRepository.findUserByLoginOrFail(userInput.login);
-        const userByEmail = await usersRepository.findUserByEmailOrFail(userInput.email);
+        const userByLogin = await this.usersRepository.findUserByLoginOrFail(userInput.login);
+        const userByEmail = await this.usersRepository.findUserByEmailOrFail(userInput.email);
 
         //если есть такой логин ИЛИ email, то возвращаем null и статус
         if( userByLogin.status === ResultStatuses.success) {
@@ -217,22 +221,22 @@ export class UsersService {
         }
 
         //отправляем в БД, чтобы получить его id
-        const createdId:string = await usersRepository.createUser(newUser);
+        const createdId:string = await this.usersRepository.createUser(newUser);
         return {data:createdId, status:ResultStatuses.success}
 
     }
     async confirmUser(code: string): Promise<IResult<string | null>> {
-        const result = await usersRepository.confirmEmailByCode(code);
+        const result = await this.usersRepository.confirmEmailByCode(code);
         return {data: result.data, status: result.status, errorMessage: result.errorMessage}
     }
     async updateConfirmationCode(email: string): Promise<void> {
         const code = uuidv4();
-        await usersRepository.updateConfirmationCode(email, code);
+        await this.usersRepository.updateConfirmationCode(email, code);
         const result = await nodemailerHelper.sendConfirmationEmail(email, code);
         return
     }
     async removeUser(userId: string){
-        await usersRepository.removeUser(userId);
+        await this.usersRepository.removeUser(userId);
         return
     }
 }

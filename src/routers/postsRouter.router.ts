@@ -24,14 +24,16 @@ import {setPaginationAndSortingFilter} from "../core/pagination/pagination-and-s
 import {PostsService} from "../Entity/Posts/BLL/postsService.bll";
 import {TypeCommentatorInfo, TypeCommentInputModel} from "../Entity/Comments/Comment.types";
 import {CommentService} from "../Entity/Comments/BLL/commentService.bll";
-import {postsController} from "../composition-root";
+import {container} from "../composition-root";
+import {inject, injectable} from "inversify";
 
 export const postsRouter = Router({});
 
+@injectable()
 export class PostsController {
-    constructor(protected queryRepo: QueryRepo,
-                protected postsService: PostsService,
-                protected commentService: CommentService){}
+    constructor(@inject(QueryRepo)protected queryRepo: QueryRepo,
+                @inject(PostsService)protected postsService: PostsService,
+                @inject(CommentService)protected commentService: CommentService){}
     async getAllPostsHandler(req:Request, res:Response) {
         const query:Partial<IPAginationAndSorting<PostsSortFields>> = req.query;
         const filter = setPaginationAndSortingFilter<PostsSortFields>(query);
@@ -132,6 +134,7 @@ export class PostsController {
     }
 }
 
+const postsController =  container.get(PostsController)
 postsRouter
     .get('/', /*queryPaginationValidation(PostsSortFields), checkValidationErrors,*/ postsController.getAllPostsHandler.bind(postsController))
     .get('/:id', idValidation, checkValidationErrors, postsController.getPostByIdHandler.bind(postsController))

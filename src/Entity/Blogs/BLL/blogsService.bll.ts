@@ -1,8 +1,9 @@
 import {TypeBlogPostInputModel, TypePost} from "../../Posts/Post.types";
 import {QueryRepo, queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 import {TypeBlog, TypeBlogInputModel} from "../Blog.types";
-import {PostsRepository, postsRepository} from "../../../core/dataAcsessLayer/repository/postsRepository.repository";
-import {BlogsRepository, blogsRepository} from "../../../core/dataAcsessLayer/repository/blogsRepository.repository";
+import {PostsRepository, } from "../../../core/dataAcsessLayer/repository/postsRepository.repository";
+import {BlogsRepository, } from "../../../core/dataAcsessLayer/repository/blogsRepository.repository";
+import {inject, injectable} from "inversify";
 
 // export const blogsService = {
 //     async createPostForSpecificBlog(blogId: string, dto: TypeBlogPostInputModel) {
@@ -39,10 +40,11 @@ import {BlogsRepository, blogsRepository} from "../../../core/dataAcsessLayer/re
 //     }
 // }
 
+@injectable()
 export class BlogsService {
-    constructor(protected queryRepo: QueryRepo,
-                protected postsRepository: PostsRepository,
-                protected blogsRepository: BlogsRepository) {}
+    constructor(@inject(QueryRepo)protected queryRepo: QueryRepo,
+                @inject(PostsRepository)protected postsRepository: PostsRepository,
+                @inject(BlogsRepository) protected blogsRepository: BlogsRepository) {}
 
     async createPostForSpecificBlog(blogId: string, dto: TypeBlogPostInputModel) {
         const blog = await this.queryRepo.findBlogByIdOrFail(blogId);
