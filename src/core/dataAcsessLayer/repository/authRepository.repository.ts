@@ -4,6 +4,10 @@ import {IResult, ResultStatuses} from "../../types/ResultObject.type";
 import {jwtHelper} from "../../helpers/jwt.helper";
 import {TypeSessionModel, TypeSessionUpdateModel} from "../../auth/auth.types";
 import {injectable} from "inversify";
+import {add} from "date-fns";
+import {TypeRecoveryPasswordModel} from "../../protection/Protection.types";
+import {WithId} from "mongodb";
+import {TypeUserExtended} from "../../../Entity/Users/User.types";
 
 export type TypeAccessDataModel = {
     jti: string;
@@ -159,7 +163,7 @@ export class AuthRepo {
             lastActivity: new Date(decodedRefresh!.iat!* 1000),
             revoked: false
         }
-        await authRepo.addSession(update);
+        await this.addSession(update);
         return  {data: {accessToken: newAccessToken, refreshToken: newRefreshToken.refreshToken}, status: ResultStatuses.success}
     }
     async removeRefreshToken(token: JwtPayload):Promise<IResult<null>>{
@@ -181,17 +185,55 @@ export class AuthRepo {
             }});
         return {data: null, status: ResultStatuses.success}
     }
-    async recoveryPassword(email: string): Promise<IResult<null | string>> {
-        let result: IResult;
+    async recoveryPassword(email: string, confirmationCode:string): Promise<IResult<null | string>> {
         //проверяем, есть ли такой email
-        const user = usersCollection.findOne({"accountData.email": email});
+        const user: WithId<TypeUserExtended> | null = await usersCollection.findOne({"accountData.email": email});
         if(!user) {
-            result = {data: null, status: ResultStatuses.notFound}
-            return result
+            return {data: null, status: ResultStatuses.notFound}
+        }
+        //заготовка данных для вставки
+        const newRecovery: TypeRecoveryPasswordModel = {
+            confirmationCode:confirmationCode,
+            expirationDate:add(new Date(),{
+                hours: 1,
+                minutes: 2,
+            }),
+            isConfirmed:  false
+        }
+        //обновлем у юзера поля в passwordRecovery
+        await usersCollection.updateOne(
+            { _id: user._id },
+            { $set: { "passwordRecovery.confirmationCode":newRecovery.confirmationCode,
+                    "passwordRecovery.expirationDate":newRecovery.expirationDate,
+                    "passwordRecovery.isConfirmed":newRecovery.isConfirmed
+                }
+            }
+        );
+        return {data: null, status: ResultStatuses.success}
+    }
+    async setNewPassword(code:string, newPasswordHash: string){
+        const user = await usersCollection.findOne({"passwordRecovery.confirmationCode": code});
+        if(!user){
+            return {data: null, status: ResultStatuses.notFound, errorMessage: {field: 'recoveryCode', message: 'user not found'}};
+        }
+        if(user.passwordRecovery.expirationDate < new Date()){
+            return {data: null, status: ResultStatuses.unauthorized, errorMessage: {field: 'recoveryCode', message: 'code expired'}}
         }
 
-        return
+        //проверяем, чтобы не был уже подтвержден
+        if (user.passwordRecovery.isConfirmed){
+            //изначально я поле ошибки я написал email и из-за этого тест падал
+            return {data: null, status: ResultStatuses.alreadyExist, errorMessage: {field: 'recoveryCode', message: 'code already confirmed'}};
+        }
+        //обновляем данные, если все четко
+        await usersCollection.updateOne(
+            { _id: user._id },
+            { $set: { "passwordRecovery.isConfirmed": true,
+                    "accountData.password": newPasswordHash
+            }}
+        )
+
+        return {data: null, status: ResultStatuses.success}
     }
 }
 
-export const  authRepo = new AuthRepo();

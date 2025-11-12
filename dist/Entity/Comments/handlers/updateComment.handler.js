@@ -1,37 +1,28 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCommentHandler = updateCommentHandler;
-const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.repository");
-const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
-const commentService_bll_1 = require("../BLL/commentService.bll");
-function updateCommentHandler(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const commentId = req.params.id;
-        const userId = req.userId;
-        if (!userId) {
-            res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
-            return;
-        }
-        const user = yield queryRepo_repository_1.queryRepo.findUserByIdOrFail(userId);
-        const comment = yield queryRepo_repository_1.queryRepo.findCommentByIdOrFail(commentId);
-        if (!user || !comment) {
-            res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
-            return;
-        }
-        if (comment.commentatorInfo.userId === user.id) {
-            yield commentService_bll_1.commentService.updateComment(commentId, req.body);
-            res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
-            return;
-        }
-        res.sendStatus(httpStatuses_type_1.httpStatus.Forbidden);
-    });
-}
+// import {Request, Response} from "express";
+// import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+// import {httpStatus} from "../../../core/types/httpStatuses.type";
+// import {commentsCollection} from "../../../core/db/mongoDB.db";
+// import {commentService} from "../BLL/commentService.bll";
+//
+// export async function updateCommentHandler(req: Request, res: Response) {
+//     const commentId = req.params.id;
+//     const userId = req.userId;
+//     if (!userId) {
+//         res.sendStatus(httpStatus.NotFound);
+//         return
+//     }
+//     const user = await queryRepo.findUserByIdOrFail(userId);
+//     const comment = await queryRepo.findCommentByIdOrFail(commentId);
+//     if(!user || !comment) {
+//         res.sendStatus(httpStatus.NotFound);
+//         return
+//     }
+//
+//     if(comment.commentatorInfo.userId  === user.id) {
+//         await commentService.updateComment(commentId, req.body);
+//         res.sendStatus(httpStatus.NoContent);
+//         return
+//     }
+//     res.sendStatus(httpStatus.Forbidden)
+// }

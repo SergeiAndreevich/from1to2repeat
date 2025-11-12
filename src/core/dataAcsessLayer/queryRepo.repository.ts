@@ -15,7 +15,7 @@ import {TypeComment, TypeCommentViewModel} from "../../Entity/Comments/Comment.t
 import {mapCommentToView} from "../mappers/mapCommentToView.mapper";
 import {TypePost, TypePostViewModel} from "../../Entity/Posts/Post.types";
 import {mapSessionToView} from "../mappers/mapSessionsToView.mapper";
-import {injectable} from "inversify/lib/esm";
+import {injectable} from "inversify";
 
 //не забудь потом вернуться к пагинации и поправить типы. Как в валидации, так и в приходящей dto
 
@@ -474,4 +474,3 @@ export class QueryRepo {
     }
 }
 
-export const queryRepo = new QueryRepo()

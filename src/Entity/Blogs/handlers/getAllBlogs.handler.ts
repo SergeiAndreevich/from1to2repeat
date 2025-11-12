@@ -1,6 +1,6 @@
 import {Request,Response} from "express";
 import {setPaginationAndSortingFilter} from "../../../core/pagination/pagination-and-sorting.helper";
-import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+//import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../../../core/types/httpStatuses.type";
 import {BlogsSortFields, IPAginationAndSorting} from "../../../core/pagination/pagination-and-sorting.types";
 

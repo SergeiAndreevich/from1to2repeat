@@ -1,6 +1,7 @@
-import {protectionRepo} from "../DAL/protectionRepo.repository";
 import {IResult, ResultStatuses} from "../../types/ResultObject.type";
 import {TypeRateLimitModel} from "../Protection.types";
+import {inject, injectable} from "inversify";
+import {ProtectionRepo} from "../DAL/protectionRepo.repository";
 
 // export const protectionService = {
 //     async checkClicks (IP: string, URL:string):Promise<IResult> {
@@ -24,7 +25,10 @@ import {TypeRateLimitModel} from "../Protection.types";
 //     }
 // }
 
-class ProtectionService {
+@injectable()
+export class ProtectionService {
+    constructor(@inject(ProtectionRepo) protected protectionRepo: ProtectionRepo) {
+    }
     async checkClicks (IP: string, URL:string):Promise<IResult> {
         // Добавляем текущий запрос в БД
         const newRequest:TypeRateLimitModel = {
@@ -32,10 +36,10 @@ class ProtectionService {
             URL: URL,
             date: new Date()
         }
-        await protectionRepo.addRequest(newRequest);
+        await this.protectionRepo.addRequest(newRequest);
 
         // Проверяем количество запросов за последние 10 секунд
-        const requestsCount = await protectionRepo.getRequestsCount(IP,URL);
+        const requestsCount = await this.protectionRepo.getRequestsCount(IP,URL);
 
         // Лимит: 5 запросов за 10 секунд
         if (requestsCount > 5) {
@@ -45,4 +49,3 @@ class ProtectionService {
         return {data:null, status:ResultStatuses.success}
     }
 }
-export const protectionService = new ProtectionService()

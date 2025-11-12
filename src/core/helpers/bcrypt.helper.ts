@@ -9,14 +9,13 @@ import bcrypt from 'bcrypt';
 //     }
 // }
 
-class BcryptHelper {
+export const bcryptHelper  ={
     async generateHash(password:string, rounds: number):Promise<string>{
-        const hash = bcrypt.hash(password, rounds);
+        const hash = await bcrypt.hash(password, rounds);
         return hash
-    }
+    },
     async isPasswordCorrect(password:string, passwordFromDB:string):Promise<boolean>{
-        return bcrypt.compare(password, passwordFromDB);
+        return await bcrypt.compare(password, passwordFromDB);
     }
 }
 
-export const bcryptHelper = new BcryptHelper();

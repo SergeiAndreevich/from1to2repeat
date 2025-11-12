@@ -1,5 +1,5 @@
 import {TypeBlogPostInputModel, TypePost} from "../../Posts/Post.types";
-import {QueryRepo, queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+import {QueryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 import {TypeBlog, TypeBlogInputModel} from "../Blog.types";
 import {PostsRepository, } from "../../../core/dataAcsessLayer/repository/postsRepository.repository";
 import {BlogsRepository, } from "../../../core/dataAcsessLayer/repository/blogsRepository.repository";

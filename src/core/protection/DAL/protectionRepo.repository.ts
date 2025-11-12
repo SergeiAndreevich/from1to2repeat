@@ -1,5 +1,6 @@
 import {TypeRateLimitModel} from "../Protection.types";
 import {protectionCollection} from "../../db/mongoDB.db";
+import {inject, injectable} from "inversify";
 
 // export const protectionRepo = {
 //     async addRequest(newRepuest:TypeRateLimitModel){
@@ -24,7 +25,8 @@ import {protectionCollection} from "../../db/mongoDB.db";
 //     }
 // }
 
-class ProtectionRepo {
+@injectable()
+export class ProtectionRepo {
     async addRequest(newRepuest:TypeRateLimitModel){
         await protectionCollection.insertOne(newRepuest);
         return
@@ -47,4 +49,3 @@ class ProtectionRepo {
     }
 }
 
-export const protectionRepo = new  ProtectionRepo();

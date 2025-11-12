@@ -8,8 +8,8 @@ import { v4 as uuidv4 } from "uuid";
 import { add } from "date-fns";
 import {nodemailerHelper} from "../../../core/helpers/nodemailer.helper";
 import {TypeMyError} from "../../../core/errors/validationErrorResult.handler";
-import {injectable} from "inversify/lib/esm";
-import {inject} from "inversify";
+import {injectable, inject} from "inversify";
+import {nullThrows} from "@typescript-eslint/eslint-plugin/dist/util";
 
 export const SALT_ROUNDS = 10;
 type TypeTestExportData ={
@@ -172,6 +172,11 @@ export class UsersService {
                     minutes: 2,
                 }),
                 isConfirmed: false
+            },
+            passwordRecovery:{
+                confirmationCode: null,
+                expirationDate: new Date(),
+                isConfirmed: false
             }
         }
 
@@ -217,6 +222,11 @@ export class UsersService {
                     minutes: 2,
                 }),
                 isConfirmed: true
+            },
+            passwordRecovery: {
+                confirmationCode: null,
+                expirationDate: new Date(),
+                isConfirmed: false
             }
         }
 

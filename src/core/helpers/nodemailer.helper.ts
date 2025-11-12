@@ -41,6 +41,20 @@ export const nodemailerHelper = {
 `,
         });
         return result
+    },
+    async sendPasswordRecoveryCode(email: string, code: string) {
+        const result = await transport.sendMail({
+            from: `"My App" <${MAIL_RU_EMAIL}>`,
+            //from: `"My App" <noreply@app.com>`,
+            to: email,
+            subject: "Восстановление пароля",
+            html:  `<h1>Password recovery</h1>
+       <p>To finish password recovery please follow the link below:
+          <a href='https://somesite.com/password-recovery?recoveryCode=${code}'>recovery password</a>
+      </p>
+`,
+        });
+        return result
     }
 }
 

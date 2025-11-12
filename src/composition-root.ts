@@ -1,24 +1,26 @@
 import "reflect-metadata";
 import {QueryRepo} from "./core/dataAcsessLayer/queryRepo.repository";
-import {BlogsController} from "./routers/blogsRouter.router";
 import {BlogsService} from "./Entity/Blogs/BLL/blogsService.bll";
 import {BlogsRepository} from "./core/dataAcsessLayer/repository/blogsRepository.repository";
 import {PostsRepository} from "./core/dataAcsessLayer/repository/postsRepository.repository";
-import {CommentsController} from "./routers/commentsRouter.router";
 import {CommentService} from "./Entity/Comments/BLL/commentService.bll";
-import {commentRepository, CommentRepository} from "./core/dataAcsessLayer/repository/commentRepository.repository";
-import {PostsController} from "./routers/postsRouter.router";
+import {CommentRepository} from "./core/dataAcsessLayer/repository/commentRepository.repository";
 import {PostsService} from "./Entity/Posts/BLL/postsService.bll";
-import {SecurityController} from "./routers/securityDevices.router";
 import {SessionsRepo} from "./core/dataAcsessLayer/repository/sessionsRepository.repository";
 import {SessionsService} from "./core/auth/BLL/sessionsService.bll";
-import {UsersController} from "./routers/usersRouter.router";
 import {UsersService} from "./Entity/Users/BLL/usersService.bll";
 import {Container} from "inversify";
 import {AuthController} from "./classes/auth";
 import {UsersRepository} from "./core/dataAcsessLayer/repository/usersRepository.repository";
 import {AuthRepo} from "./core/dataAcsessLayer/repository/authRepository.repository";
 import {AuthService} from "./core/auth/BLL/authService.bll";
+import {ProtectionRepo} from "./core/protection/DAL/protectionRepo.repository";
+import {ProtectionService} from "./core/protection/BLL/protectionService.bll";
+import {BlogsController} from "./classes/blogs";
+import {CommentsController} from "./classes/comments";
+import {PostsController} from "./classes/posts";
+import {SecurityController} from "./classes/security";
+import {UsersController} from "./classes/users";
 
 //ниже закоментирован самописный ioc-контейнер
 // const queryRepo: QueryRepo = new QueryRepo();
@@ -70,6 +72,7 @@ container.bind(PostsService).to(PostsService);
 container.bind(CommentService).to(CommentService);
 container.bind(BlogsService).to(BlogsService);
 container.bind(AuthService).to(AuthService);
+container.bind(ProtectionService).to(ProtectionService);
 
 container.bind(QueryRepo).to(QueryRepo);
 container.bind(SessionsRepo).to(SessionsRepo);
@@ -78,6 +81,7 @@ container.bind(CommentRepository).to(CommentRepository);
 container.bind(BlogsRepository).to(BlogsRepository);
 container.bind(UsersRepository).to(UsersRepository);
 container.bind(AuthRepo).to(AuthRepo);
+container.bind(ProtectionRepo).to(ProtectionRepo);
 
 //и на это вродее как всё. Самое главное прописать декоратор для класса и декораторы в конструкторе
 //injectable - класс, который можно вставлять в контейнер и в другой класс

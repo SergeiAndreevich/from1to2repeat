@@ -1,5 +1,5 @@
 import {Request,Response} from "express";
-import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+//import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 import {setPaginationAndSortingFilter} from "../../../core/pagination/pagination-and-sorting.helper";
 import {httpStatus} from "../../../core/types/httpStatuses.type";
 import {

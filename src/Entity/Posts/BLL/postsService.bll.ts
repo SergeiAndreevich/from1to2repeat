@@ -1,8 +1,8 @@
 import {TypePost, TypePostInputModel} from "../Post.types";
 import {query} from "express-validator";
-import {QueryRepo, queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+import {QueryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 import {repository} from "../../../core/dataAcsessLayer/repository.repository";
-import {PostsRepository, postsRepository} from "../../../core/dataAcsessLayer/repository/postsRepository.repository";
+import {PostsRepository} from "../../../core/dataAcsessLayer/repository/postsRepository.repository";
 import {inject, injectable} from "inversify";
 
 // export const postsService = {

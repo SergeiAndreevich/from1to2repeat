@@ -1,9 +1,13 @@
 import {TypeAuthInputModel, TypeSessionInputData, TypeSessionModel} from "../auth.types";
-import {QueryRepo, queryRepo} from "../../dataAcsessLayer/queryRepo.repository";
+import {QueryRepo} from "../../dataAcsessLayer/queryRepo.repository";
 import {IResult, ResultStatuses} from "../../types/ResultObject.type";
 import {jwtHelper} from "../../helpers/jwt.helper";
-import {AuthRepo, authRepo} from "../../dataAcsessLayer/repository/authRepository.repository";
+import {AuthRepo} from "../../dataAcsessLayer/repository/authRepository.repository";
 import {inject, injectable} from "inversify";
+import {bcryptHelper} from "../../helpers/bcrypt.helper";
+import {SALT_ROUNDS} from "../../../Entity/Users/BLL/usersService.bll";
+import {nodemailerHelper} from "../../helpers/nodemailer.helper";
+import {v4 as uuidv4} from "uuid";
 
 // export const authService = {
 //     async checkUserInfo(info: TypeAuthInputModel, dataToDb: TypeSessionInputData):Promise<IResult<{accessToken:string,refreshToken:string } | null>>{
@@ -129,14 +133,20 @@ export class AuthService {
     }
     async recoveryPassword(email:string): Promise<void> {
         //отдаем в repository и если такой есть, то отправляем туда код
-        const result = await this.authRepo.recoveryPassword(email);
-        return result
+        const confirmationCode = uuidv4();
+        const result = await this.authRepo.recoveryPassword(email, confirmationCode);
+        if(result.status === ResultStatuses.notFound){
+            return
+        }
+        //отправляем письмо на почту для подтверждения
+        await nodemailerHelper.sendPasswordRecoveryCode(email, confirmationCode);
+        return
     }
-    async setNewPassword(code: string, newPassword: string){
+    async setNewPassword(code: string, newPassword: string): Promise<IResult>{
         //отдаем код и пароль в репозиторий, если код ок, то обновляем запись о пароле
-        const result = await this.authRepo.setNewPassword(code, newPassword);
-        return result
+        const newPasswordHash = await bcryptHelper.generateHash(newPassword, SALT_ROUNDS);
+        const result = await this.authRepo.setNewPassword(code, newPasswordHash);
+        return {data: result.data, status: result.status, errorMessage: result.errorMessage}
     }
 }
 
-export const authService =  new AuthService();

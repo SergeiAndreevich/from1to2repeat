@@ -23,6 +23,11 @@ export type TypeUserExtended = {
         confirmationCode: string,
         expirationDate: Date,
         isConfirmed: boolean
+    },
+    passwordRecovery:{
+        confirmationCode: string | null,
+        expirationDate: Date,
+        isConfirmed: boolean
     }
 }
 class UserExtended {

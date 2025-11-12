@@ -1,9 +1,9 @@
 import {Request, Response} from "express";
 import {httpStatus} from "../core/types/httpStatuses.type";
-import {QueryRepo, queryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
+import {QueryRepo} from "../core/dataAcsessLayer/queryRepo.repository";
 import {TypeMeViewModel} from "../core/auth/handlers/whoAmI.handler";
 import {inject, injectable} from "inversify";
-import {AuthService, authService} from "../core/auth/BLL/authService.bll";
+import {AuthService} from "../core/auth/BLL/authService.bll";
 import {ResultStatuses} from "../core/types/ResultObject.type";
 import {createErrorsMessages} from "../core/errors/createErrorsMessage.function";
 import {TypeUserInputModel} from "../Entity/Users/User.types";
@@ -166,7 +166,7 @@ export class AuthController {
         //получаем email
         const email = req.body.email;
         //отдаем его в сервис и говорим "отправь код восстановления пароля"
-        const result = await this.authService.recoveryPassword(email);
+        await this.authService.recoveryPassword(email);
         //успешно? отправляем 204
         res.sendStatus(httpStatus.NoContent)
     }
@@ -174,10 +174,10 @@ export class AuthController {
         //забираем данные из боди
         const input = req.body;
         //отдаем в сервис и говорим "обнови"
-        const result = await this.authService.setNewPassword(input.newPassword, input.recoveryCode);
+        const result = await this.authService.setNewPassword(input.recoveryCode,input.newPassword);
         //получаем результат
         if(result.status !== ResultStatuses.success) {
-            res.sendStatus(httpStatus.BadRequest);
+            res.status(httpStatus.BadRequest).send(createErrorsMessages(result.errorMessage!));
             return
         }
         res.sendStatus(httpStatus.NoContent)

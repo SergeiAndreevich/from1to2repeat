@@ -2,16 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.securityRouter = void 0;
 const express_1 = require("express");
-const getAllDevices_handler_1 = require("../core/auth/sessions/getAllDevices.handler");
-const removeOtherSessions_handler_1 = require("../core/auth/sessions/removeOtherSessions.handler");
-const removeThisSession_handler_1 = require("../core/auth/sessions/removeThisSession.handler");
 const validationErrorResult_handler_1 = require("../core/errors/validationErrorResult.handler");
 const deviceIdValidation_validation_1 = require("../core/validation/deviceIdValidation.validation");
+const composition_root_1 = require("../composition-root");
+const security_1 = require("../classes/security");
 exports.securityRouter = (0, express_1.Router)({});
+const securityController = composition_root_1.container.get(security_1.SecurityController);
 exports.securityRouter
-    .get('/devices', getAllDevices_handler_1.getAllDevicesHandler) //выдаем массив всех сессий
-    .delete('/devices', removeOtherSessions_handler_1.removeOtherSessionsHandler) //протухаем все сессии, кроме текущей
-    .delete('/devices/:deviceId', deviceIdValidation_validation_1.deviceIdValidation, validationErrorResult_handler_1.checkValidationErrors, removeThisSession_handler_1.removeThisSessionHandler); //протухаем текущую сессию
+    .get('/devices', securityController.getAllDevicesHandler.bind(securityController)) //выдаем массив всех сессий
+    .delete('/devices', securityController.removeOtherSessionsHandler.bind(securityController)) //протухаем все сессии, кроме текущей
+    .delete('/devices/:deviceId', deviceIdValidation_validation_1.deviceIdValidation, validationErrorResult_handler_1.checkValidationErrors, securityController.removeThisSessionHandler.bind(securityController)); //протухаем текущую сессию
 //может быть не надо делать токен гуард, а простот в хенждлере вытаскивать РТ и если его нет то анавторайзд
 //короче, при GET./devices получаем из куки refreshToken, проверяем его и отдаем в БД
 //в БД ищем все сессии, у которых [userId: userId, revoked:false] и мапим массив для нужного вида

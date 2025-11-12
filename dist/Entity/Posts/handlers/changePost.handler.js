@@ -1,31 +1,21 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePostHandler = changePostHandler;
-const postsService_bll_1 = require("../BLL/postsService.bll");
-const httpStatuses_type_1 = require("../../../core/types/httpStatuses.type");
-const queryRepo_repository_1 = require("../../../core/dataAcsessLayer/queryRepo.repository");
-function changePostHandler(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const postId = req.params.id;
-        const post = yield queryRepo_repository_1.queryRepo.findPostByIdOrFail(postId);
-        //отработали 404
-        if (!post) {
-            res.sendStatus(httpStatuses_type_1.httpStatus.NotFound);
-            return;
-        }
-        yield postsService_bll_1.postsService.updatePost(postId, req.body);
-        res.sendStatus(httpStatuses_type_1.httpStatus.NoContent);
-    });
-}
+// import {Request, Response} from 'express';
+// import {repository} from "../../../core/dataAcsessLayer/repository.repository";
+// import {postsService} from "../BLL/postsService.bll";
+// import {httpStatus} from "../../../core/types/httpStatuses.type";
+// import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+//
+// export async function changePostHandler(req:Request,res:Response) {
+//     const postId = req.params.id;
+//     const post = await queryRepo.findPostByIdOrFail(postId);
+//     //отработали 404
+//     if(!post){
+//         res.sendStatus(httpStatus.NotFound);
+//         return
+//     }
+//     await postsService.updatePost(postId,req.body);
+//     res.sendStatus(httpStatus.NoContent)
+// }
 //здесб задействованы 204,400, 401 и 404
 //400 отрабатывает в валидаторе
 //401 в авторизации

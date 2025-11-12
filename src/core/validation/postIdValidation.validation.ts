@@ -1,5 +1,4 @@
 import {param} from "express-validator";
-import {queryRepo} from "../dataAcsessLayer/queryRepo.repository";
 
 export const postIdValidation = param('postId')
     .exists()

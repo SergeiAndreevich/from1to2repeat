@@ -9,9 +9,9 @@ function setPaginationAndSortingFilter(queryDto) {
         pageSize: Number(queryDto.pageSize) || pagination_and_sorting_types_1.paginationAndSortingDefault.pageSize,
         sortBy: queryDto.sortBy ? queryDto.sortBy : pagination_and_sorting_types_1.paginationAndSortingDefault.sortBy,
         sortDirection: queryDto.sortDirection ? queryDto.sortDirection : pagination_and_sorting_types_1.paginationAndSortingDefault.sortDirection,
-        searchNameTerm: queryDto === null || queryDto === void 0 ? void 0 : queryDto.searchNameTerm,
-        searchLoginTerm: queryDto === null || queryDto === void 0 ? void 0 : queryDto.searchLoginTerm,
-        searchEmailTerm: queryDto === null || queryDto === void 0 ? void 0 : queryDto.searchEmailTerm
+        searchNameTerm: queryDto?.searchNameTerm,
+        searchLoginTerm: queryDto?.searchLoginTerm,
+        searchEmailTerm: queryDto?.searchEmailTerm
     };
     return filter;
 }

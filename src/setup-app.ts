@@ -8,7 +8,6 @@ import {usersRouter} from "./routers/usersRouter.router";
 import {commentsRouter} from "./routers/commentsRouter.router";
 import cookieParser from "cookie-parser";
 import {securityRouter} from "./routers/securityDevices.router";
-import {getAllDevicesHandler} from "./core/auth/sessions/getAllDevices.handler";
 
 export const setupApp =(app: Express)=>{
     app.use(cookieParser());

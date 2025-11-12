@@ -1,5 +1,9 @@
 import {body} from "express-validator";
-import {queryRepo} from "../dataAcsessLayer/queryRepo.repository";
+import {QueryRepo} from "../dataAcsessLayer/queryRepo.repository";
+import {container} from "../../composition-root";
+
+const queryRepo = new QueryRepo();
+
 
 const titleValidation = body("title")
     .exists()
@@ -39,7 +43,7 @@ const blogIdValidation =  body("blogId")
     .custom(async (value) => {
         // value - это значение blogId, которое нужно проверить
         await queryRepo.findBlogByIdOrFail(value);
-        return
+        return true
     })
     .withMessage('Blog with this id does not exist')
 

@@ -1,8 +1,10 @@
 import {NextFunction, Request, Response} from 'express';
-import {protectionService} from "./BLL/protectionService.bll";
 import {ResultStatuses} from "../types/ResultObject.type";
 import {httpStatus} from "../types/httpStatuses.type";
+import {container} from "../../composition-root";
+import {ProtectionService} from "./BLL/protectionService.bll";
 
+const protectionService = container.get(ProtectionService);
 export async function antiClicker (req: Request, res: Response, next: NextFunction): Promise<void> {
     //получаем IP и URL
     const IP = req.ip || req.socket.remoteAddress || 'unknown';

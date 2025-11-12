@@ -1,7 +1,6 @@
 import {Request, Response} from 'express';
-import {blogsService} from "../BLL/blogsService.bll";
 import {httpStatus} from "../../../core/types/httpStatuses.type";
-import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+//import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 
 // export async function createPostForSpecificBlogHandler(req:Request,res:Response) {
 //     const blog = await queryRepo.findBlogByIdOrFail(req.params.blogId);

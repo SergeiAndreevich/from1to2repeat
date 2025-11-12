@@ -1,5 +1,5 @@
 import {Request, Response} from 'express';
-import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
+//import {queryRepo} from "../../../core/dataAcsessLayer/queryRepo.repository";
 import {httpStatus} from "../../../core/types/httpStatuses.type";
 
 // export async function getBlogByIdHandler(req: Request, res: Response) {
